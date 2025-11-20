@@ -101,7 +101,7 @@ function DashBoard() {
           </div>
 
           {/* Desktop: sidebar left, main right */}
-          <div className="hidden md:flex flex-1 w-full h-full">
+          <div className="hidden md:flex flex-1 w-full h-full py-12">
             <div className="flex-shrink-0">
               <Suspense fallback={<Loading />}><CategoryNavBar /></Suspense>
             </div>

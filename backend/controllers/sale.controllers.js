@@ -41,35 +41,40 @@ const addSale = async (req, res, next) => {
     next(error);
   }
 };
-// 2. getSales
+// 2 getSales.
 const getSales = async (req, res, next) => {
   try {
-    const { seller, upperDate, lowerDate } = req.query;
+    const { search, upperDate, lowerDate } = req.query;
 
-    // Build the query object
     let query = {};
 
-    if (seller) {
-      query.seller = seller;
+    // Search filter
+    if (search && search.trim() !== "") {
+      const item = await Item.findOne({ name: { $regex: search, $options: "i" } });
+      if (item) query.item = item._id;
+      else query.seller = { $regex: search, $options: "i" };
     }
 
+    // Date filter
     if (lowerDate || upperDate) {
       query.date = {};
-      if (lowerDate) query.date.$gte = new Date(lowerDate);
-      if (upperDate) query.date.$lte = new Date(upperDate);
+      if (lowerDate) {query.date.$gte = new Date(lowerDate);}
+      if (upperDate) {query.date.$lte = new Date(upperDate);}
+
+      // If both dates are the same, match that exact day
+      if (lowerDate && upperDate && lowerDate === upperDate) {
+        query.date = new Date(lowerDate);
+      }
     }
 
-    // Fetch sales with only item name and price populated
-    const sales = await Sale.find(query)
-      .populate("item", "name price image");  // only populate item name and price
+    const sales = await Sale.find(query).populate("item", "name price image description");
 
     return res.status(200).json({
       message: "Sales fetched successfully",
       error: false,
       success: true,
-      data: sales
+      sales
     });
-
   } catch (error) {
     next(error);
   }

@@ -23,5 +23,13 @@ Step - 3. use code Spliting to increment performance and I will use bounce to ma
   { "name": "Body Care" },
   { "name": "Tools & Accessories" }
 ]
+{
+  "search": "Eyueal",
+  "lowerDate": "2025-11-16",
+  "upperDate": "2025-11-18"
+}
+{
+  "search": "eyueal"
+}
 
 */

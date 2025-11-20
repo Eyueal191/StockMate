@@ -15,8 +15,23 @@ function StockProvider({ children }) {
   const [searchSale, setSearchSale] = useState("");
   const [upperDate, setUpperDate] = useState("");
   const [lowerDate, setLowerDate] = useState("");
-
+  const [saleList, setSaleList] = useState([]);
   // ------------------ Fetch function ------------------
+  const getSaleList = async () => {
+    try {
+      let paramsPayload = {
+        search:searchSale,
+        upperDate,
+        lowerDate
+      }
+      let res = await Axios.get("/api/sale/", {params:paramsPayload})
+      if(res.data.success){
+        setSaleList(res.data.sales)
+      }
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
   const getItemsList = async () => {
     try {
       const paramsPayload = {
@@ -54,7 +69,12 @@ function StockProvider({ children }) {
       dispatch(setItems(fetchedItemsList));
     }
   }, [fetchedItemsList, dispatch]);
-
+  useEffect(()=>{
+     getSaleList()
+  },[upperDate, lowerDate,searchSale])
+  const refetchSaleList = async () => {
+  await getSaleList();
+};
   // ------------------ Context values ------------------
   const values = {
     // Items filtering
@@ -75,6 +95,8 @@ function StockProvider({ children }) {
     setUpperDate,
     lowerDate,
     setLowerDate,
+    saleList,
+    refetchSaleList
   };
 
   return (

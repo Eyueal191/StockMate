@@ -1,20 +1,20 @@
-// src/components/SaleSearchBar.jsx
-import React, { useState, useContext, useMemo, useCallback } from "react";
+// src/components/bars/SaleSearchBar.jsx
+import React, { useState, useContext, useMemo, useCallback, useEffect } from "react";
 import { debounce } from "lodash";
 import { StockContext } from "../../stockContext/StockContext.jsx";
 import { Search, X } from "lucide-react";
 
 const SaleSearchBar = () => {
-  const { setSearchSale } = useContext(StockContext); // updated
+  const { setSearchSale } = useContext(StockContext);
   const [query, setQuery] = useState("");
 
-  // debounce wrapper (stable)
+  // Stable debounced function
   const debouncedSetSearchSale = useMemo(
     () => debounce((value) => setSearchSale(value), 500),
     [setSearchSale]
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     return () => debouncedSetSearchSale.cancel();
   }, [debouncedSetSearchSale]);
 
@@ -29,7 +29,7 @@ const SaleSearchBar = () => {
     setSearchSale(query);
   }, [query, setSearchSale, debouncedSetSearchSale]);
 
-  const clear = () => {
+  const clearSearch = () => {
     debouncedSetSearchSale.cancel();
     setQuery("");
     setSearchSale("");
@@ -37,39 +37,34 @@ const SaleSearchBar = () => {
 
   return (
     <div
+      role="search"
+      aria-label="Search sales"
       className="
         flex items-center
         w-full max-w-full
-        sm:max-w-md
-        md:max-w-lg
-        lg:max-w-xl
-        xl:max-w-2xl
-        bg-white border border-gray-400
+        sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl
+        bg-white border border-gray-300
         rounded-lg shadow-sm
-        transition
-        focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-300
         px-3 py-1.5 sm:px-3.5 sm:py-2 lg:px-4 lg:py-2
         gap-2
         mx-auto
+        transition focus-within:ring-2 focus-within:ring-blue-300 focus-within:border-blue-300
       "
-      role="search"
-      aria-label="Search sales"
     >
-      {/* Text input */}
+      {/* Input */}
       <input
         type="text"
-        aria-label="Search sales"
-        placeholder="Search sales..."
+        placeholder="Search Sale's Record By Seller's Name or SoldItem's Name..."
         value={query}
         onChange={handleChange}
         onKeyDown={(e) => {
           if (e.key === "Enter") handleSearchNow();
-          if (e.key === "Escape") clear();
+          if (e.key === "Escape") clearSearch();
         }}
         className="
           flex-1 bg-transparent outline-none
           text-sm sm:text-sm lg:text-base
-          placeholder-gray-400 text-gray-800
+          placeholder-gray-400 text-gray-900
           px-1
         "
       />
@@ -78,7 +73,7 @@ const SaleSearchBar = () => {
       {query && (
         <button
           type="button"
-          onClick={clear}
+          onClick={clearSearch}
           aria-label="Clear search"
           title="Clear"
           className="

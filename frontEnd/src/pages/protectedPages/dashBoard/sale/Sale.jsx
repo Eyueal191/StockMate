@@ -1,81 +1,90 @@
 // src/pages/protectedPages/dashBoard/sale/Sale.jsx
-import React from "react";
-import { Outlet, NavLink } from "react-router-dom";
-
+import React, { lazy, Suspense } from "react";
+import { Outlet } from "react-router-dom";
+import Loading from "../../../../components/Loading.jsx";
+import { useLocation } from "react-router-dom";
+const SaleSearchBar = lazy(() => import("../../../../components/bars/SaleSearchBar"));
+const SaleNavBar = lazy(() => import("../../../../components/bars/SaleNavBar"));
+const FilterSalesByDateBar = lazy(() => import("../../../../components/bars/FilterSalesByDateBar.jsx"));
 function Sale() {
-  const activeClass =
-    "flex items-center justify-center gap-2 text-white bg-blue-600 px-5 py-3 md:py-4 rounded-xl font-semibold md:font-bold text-sm sm:text-base md:text-lg transition-all duration-200";
-  const inactiveClass =
-    "flex items-center justify-center gap-2 text-gray-600 bg-gray-50 hover:text-blue-600 hover:bg-blue-50 px-5 py-3 md:py-4 rounded-xl font-normal md:font-medium text-sm sm:text-base md:text-lg transition-all duration-200";
-
+  const location = useLocation();
+  const isSaleListPage = location.pathname === "/dashboard/sales";
   return (
-    <div className="flex flex-col w-full bg-gray-100 min-h-screen">
-      
-      {/* Desktop layout (>md): Sidebar + Main content */}
-      <div className="hidden md:flex flex-col w-full">
+    <div className="flex flex-col w-screen bg-gray-100 min-h-screen">
 
-        {/* Sidebar + Main */}
-        <div className="flex flex-1 w-full">
+      {/* Top SearchBar (Desktop >md) */}
+      {isSaleListPage &&
+      <div className="hidden md:flex justify-center w-full py-4">
+        
+        <Suspense fallback={<div className="h-12 bg-gray-200 rounded animate-pulse w-full max-w-6xl" />} >
+          <SaleSearchBar />
+        </Suspense>
+      </div>
+      }
+      {/* Desktop layout (>md) */}
+      <div className="hidden md:flex flex-1 w-full">
+        
+        {/* Sidebar */}
+        <aside className="w-64 bg-white shadow-sm overflow-y-auto">
+          <Suspense fallback={<div className="h-10 bg-gray-200 rounded animate-pulse" />} >
+            <SaleNavBar />
+          </Suspense>
+        </aside>
+
+        {/* Right column: Filter + Outlet */}
+        <div className="flex flex-col flex-1 gap-4 bg-gray-50">
           
-          {/* Sidebar */}
-          <aside className="w-64 bg-white p-6 shadow-sm">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 text-gray-800">
-              Sales Management
-            </h2>
-            <nav className="flex flex-col gap-4">
-              <NavLink
-                to="/dashboard/sales"
-                end
-                className={({ isActive }) => (isActive ? activeClass : inactiveClass)}
-              >
-                📝 Sale History
-              </NavLink>
-              <NavLink
-                to="/dashboard/sales/add"
-                className={({ isActive }) => (isActive ? activeClass : inactiveClass)}
-              >
-                ➕ Add New Sale
-              </NavLink>
-            </nav>
-          </aside>
+          {/* FilterSalesByDateBar centered */}
+          {isSaleListPage &&
+                    <div className="flex justify-center">
+            <Suspense fallback={<div className="h-12 bg-gray-200 rounded animate-pulse w-full max-w-3xl" />} >
+              <FilterSalesByDateBar />
+            </Suspense>
+          </div>
+}
 
-          {/* Main content */}
-          <main className="flex-1 p-6 overflow-auto bg-gray-50">
+          {/* Main Outlet */}
+          <main className="flex-1 bg-white rounded-xl shadow-sm overflow-auto">
             <Outlet />
           </main>
         </div>
+
       </div>
 
       {/* Mobile layout (<md) */}
-      <div className="flex flex-col md:hidden w-full items-center px-4 space-y-4">
+      <div className="flex flex-col md:hidden w-full space-y-4">
 
-        {/* Sidebar */}
-        <aside className="w-full bg-white p-4 shadow-sm rounded-lg">
-          <h2 className="text-xl font-bold mb-4 text-gray-800 text-center">
-            Sales Management
-          </h2>
-          <nav className="flex justify-center gap-4">
-            <NavLink
-              to="/dashboard/sales"
-              end
-              className={({ isActive }) => (isActive ? activeClass : inactiveClass)}
-            >
-              📝 Sale History
-            </NavLink>
-            <NavLink
-              to="/dashboard/sales/add"
-              className={({ isActive }) => (isActive ? activeClass : inactiveClass)}
-            >
-              ➕ Add New Sale
-            </NavLink>
-          </nav>
-        </aside>
+        {/* Sidebar Nav */}
+        <div className="bg-white shadow-sm rounded-lg">
+          <Suspense fallback={<div className="h-10 bg-gray-200 rounded animate-pulse" />} >
+            <SaleNavBar />
+          </Suspense>
+        </div>
+
+        {/* SearchBar below NavBar */}
+        {isSaleListPage &&
+         <div className="bg-white shadow-sm rounded-lg flex justify-center">
+          <Suspense fallback={<div className="h-10 bg-gray-200 rounded animate-pulse w-full" />} >
+            <SaleSearchBar />
+          </Suspense>
+        </div>
+        }
+
+        {/* FilterBar */}
+        {isSaleListPage &&  <div className="bg-white shadow-sm rounded-lg flex justify-center">
+          <Suspense fallback={<div className="h-10 bg-gray-200 rounded animate-pulse w-full" />} >
+            <FilterSalesByDateBar />
+          </Suspense>
+        </div>}
+       
 
         {/* Main content */}
-        <main className="w-full p-4 bg-gray-50 rounded-lg">
+        <main className="bg-white shadow-sm rounded-lg w-full">
           <Outlet />
         </main>
+
       </div>
+
     </div>
   );
 }

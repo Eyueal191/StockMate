@@ -1,3 +1,4 @@
+// src/components/bars/CategoryNavBar.jsx
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { PlusCircle, List } from "lucide-react";
@@ -15,7 +16,8 @@ function CategoryNavBar() {
 
     return `
       flex items-center gap-2 sm:gap-3 rounded-lg font-semibold
-      text-[0.75rem] sm:text-[0.875rem] md:text-[1rem] lg:text-[1.125rem] xl:text-[1.25rem] transition-all duration-200
+      text-[0.75rem] sm:text-[0.875rem] md:text-[1rem] lg:text-[1.125rem] xl:text-[1.25rem]
+      transition-all duration-200
       ${isActive ? "bg-blue-600 text-white shadow-lg" : "bg-gray-100 text-gray-900 hover:bg-gray-200"}
       px-3 py-2 sm:px-4 sm:py-2 md:px-4 md:py-3 lg:px-5 lg:py-3 xl:px-6 xl:py-4
     `;
@@ -36,6 +38,11 @@ function CategoryNavBar() {
         gap-2 md:gap-2
       "
     >
+      {/* Title */}
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-4 text-center md:text-left">
+        Category Management
+      </h2>
+
       {navItems.map((item) => {
         const Icon = item.icon;
         return (
