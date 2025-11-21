@@ -1,0 +1,201 @@
+import React, { useMemo, useRef, useState } from "react";
+import { Doughnut } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  Title,
+} from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+
+// Register ChartJS components
+ChartJS.register(ArcElement, Tooltip, Legend, Title, ChartDataLabels);
+
+// --- Custom Legend Component (Handles click-to-toggle visibility) ---
+const CustomLegend = ({ chartRef, labels, dataPoints, colors, totalRevenue }) => {
+  const chartInstance = chartRef.current;
+
+  const [hiddenItems, setHiddenItems] = useState(Array(labels.length).fill(false));
+
+  const handleLegendClick = (index) => {
+    if (!chartInstance) return;
+    chartInstance.toggleDataVisibility(index);
+    chartInstance.update();
+    setHiddenItems((prev) => {
+      const newHidden = [...prev];
+      newHidden[index] = !newHidden[index];
+      return newHidden;
+    });
+  };
+
+  return (
+    <div className="flex flex-col space-y-3 p-6 border border-gray-100 rounded-2xl bg-white shadow-lg hover:shadow-xl transition duration-300 w-full md:max-w-sm">
+      {/* Total Revenue Display */}
+      <div className="text-center md:text-left mb-4 border-b pb-3 border-gray-100">
+        <span className="text-xl lg:text-2xl font-extrabold text-gray-900">
+          Total Revenue: {totalRevenue.toLocaleString()}{" "}
+          <span className="text-red-600">Birr</span>
+        </span>
+      </div>
+
+      {/* Legend Items List */}
+      <ul className="space-y-2">
+        {labels.map((label, i) => {
+          const value = dataPoints[i];
+          const color = colors[i] || "rgba(0,0,0,0.7)";
+          const percentage = ((value / totalRevenue) * 100).toFixed(2);
+          const isHidden = hiddenItems[i];
+
+          return (
+            <li
+              key={label}
+              className={`flex items-center cursor-pointer p-2 rounded-lg transition-all ${
+                isHidden
+                  ? "opacity-40 bg-gray-50"
+                  : "text-gray-800 font-semibold hover:bg-indigo-50 hover:shadow-sm"
+              }`}
+              onClick={() => handleLegendClick(i)}
+            >
+              {/* Legend Color Box */}
+              <span
+                className="inline-block w-5 h-5 rounded-md mr-3 border transition-transform"
+                style={{
+                  backgroundColor: isHidden ? "#f9fafb" : color,
+                  borderColor: isHidden ? "rgba(0,0,0,0.1)" : color,
+                  transform: isHidden ? "scale(0.95)" : "scale(1)",
+                }}
+              ></span>
+              <span className={isHidden ? "line-through text-gray-400" : "text-gray-700"}>
+                {label}: {value.toLocaleString()}{" "}
+                <span className="text-red-600">Birr</span>
+              </span>
+              <span
+                className={`ml-auto font-bold ${isHidden ? "text-gray-400" : "text-indigo-600"}`}
+              >
+                ({percentage}%)
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
+
+// --- Main Donut Chart Component ---
+function DonutChart({ labels = [], dataPoints = [], colors = [] }) {
+  const chartRef = useRef(null);
+
+  const defaultColors = [
+    "rgba(54, 162, 235, 0.7)",
+    "rgba(255, 99, 132, 0.7)",
+    "rgba(255, 206, 86, 0.7)",
+    "rgba(75, 192, 192, 0.7)",
+    "rgba(153, 102, 255, 0.7)",
+    "rgba(255, 159, 64, 0.7)",
+  ];
+
+  const chartColors = colors.length ? colors : defaultColors;
+  const totalRevenue = dataPoints.reduce((a, b) => a + b, 0);
+
+  const data = useMemo(
+    () => ({
+      labels,
+      datasets: [
+        {
+          label: "Revenue by Category",
+          data: dataPoints,
+          backgroundColor: chartColors,
+          borderWidth: 3,
+          borderColor: "#fff",
+          hoverOffset: 20,
+          spacing: 3,
+        },
+      ],
+    }),
+    [labels, dataPoints, chartColors]
+  );
+
+  const options = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "60%",
+      plugins: {
+        legend: {
+          display: false,
+        },
+        title: {
+          display: true,
+          text: "Revenue Analytics",
+          font: { size: 28, weight: "900" },
+          color: "#1f2937",
+          padding: { top: 15, bottom: 25 },
+        },
+        tooltip: {
+          enabled: true,
+          callbacks: {
+            label: function (tooltipItem) {
+              const value = tooltipItem.raw;
+              const percentage = ((value / totalRevenue) * 100).toFixed(2);
+              return `${tooltipItem.label}: ${value.toLocaleString()} Birr (${percentage}%)`;
+            },
+          },
+          bodyFont: { weight: "bold", size: 14 },
+          padding: 10,
+          backgroundColor: "rgba(30, 41, 59, 0.9)",
+        },
+        datalabels: {
+          display: true,
+          color: "#111",
+          font: {
+            weight: "bold",
+            size: (context) => {
+              const chartWidth = context.chart.width;
+              if (chartWidth < 400) return 10;
+              if (chartWidth < 600) return 12;
+              if (chartWidth < 900) return 14;
+              if (chartWidth < 1200) return 16;
+              return 18;
+            },
+          },
+          align: "end",
+          anchor: "end",
+          formatter: (value) => {
+            if ((value / totalRevenue) * 100 < 2) return "";
+            const percentage = ((value / totalRevenue) * 100).toFixed(1);
+            return `→ ${percentage}%`;
+          },
+        },
+      },
+    }),
+    [totalRevenue]
+  );
+
+  return (
+    <div className="w-full max-w-6xl mx-auto p-8 bg-white rounded-3xl border border-gray-100 shadow-2xl">
+      <div className="flex flex-col md:flex-row md:justify-center md:items-start space-y-10 md:space-y-0 md:space-x-12">
+        {/* Doughnut Chart Section */}
+        <div className="relative w-full max-w-md mx-auto md:w-1/2">
+          <div className="h-80 sm:h-96 lg:h-[30rem] xl:h-[34rem] mx-auto">
+            <Doughnut ref={chartRef} data={data} options={options} />
+          </div>
+        </div>
+
+        {/* Legend/Data Summary Section */}
+        <div className="w-full md:w-auto mx-auto flex justify-center md:block pt-10 md:pt-16">
+          <CustomLegend
+            chartRef={chartRef}
+            labels={labels}
+            dataPoints={dataPoints}
+            colors={chartColors}
+            totalRevenue={totalRevenue}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default DonutChart;

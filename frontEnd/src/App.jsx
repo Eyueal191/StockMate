@@ -84,7 +84,7 @@ function App() {
             <Route path="categories/edit/:id" element={<EditCategory />} />
 
             {/* ---------------- Sales ---------------- */}
-            <Route path="sales/*" element={<Sale/>}>
+            <Route path="sales/*" element={<Sale />}>
               <Route index element={<SalesList />} />        {/* /dashboard/sales */}
               <Route path="add" element={<AddSale />} />     {/* /dashboard/sales/add */}
               <Route path="list" element={<SalesList />} />  {/* optional */}
@@ -92,14 +92,19 @@ function App() {
             </Route>
 
             {/* ---------------- Reports ---------------- */}
-            <Route path="reports" element={<Reports />} />
-            <Route path="reports/sales-overview" element={<SalesOverview />} />
-            <Route path="reports/sales-by-item" element={<SalesByItem />} />
-            <Route path="reports/sales-by-category" element={<SalesByCategory />} />
-            <Route path="reports/top-items" element={<TopItems />} />
-            <Route path="reports/low-stock" element={<LowStock />} />
-            <Route path="reports/sales-comparison" element={<SalesComparison />} />
-            <Route path="reports/revenue-analytics" element={<RevenueAnalytics />} />
+            <Route path="reports" element={<Reports />}>
+              {/* Default route for /dashboard/reports */}
+              <Route index element={<SalesOverview />} />
+
+              {/* Nested report routes */}
+              <Route path="sales-overview" element={<SalesOverview />} />
+              <Route path="sales-by-item" element={<SalesByItem />} />
+              <Route path="sales-by-category" element={<SalesByCategory />} />
+              <Route path="top-items" element={<TopItems />} />
+              <Route path="low-stock" element={<LowStock />} />
+              <Route path="sales-comparison" element={<SalesComparison />} />
+              <Route path="revenue-analytics" element={<RevenueAnalytics />} />
+            </Route>
 
           </Route>
         </Routes>
@@ -109,5 +114,4 @@ function App() {
     </>
   );
 }
-
 export default App;

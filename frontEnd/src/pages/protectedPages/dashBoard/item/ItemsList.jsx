@@ -43,7 +43,8 @@ function ItemsList() {
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 py-4">
         <h1 className="text-2xl font-bold flex items-center gap-3">
           <span>Items List</span>
-          <span className="w-30 h-1 mt-4 bg-gray-400 rounded-full"></span>
+          <span className="block mt-4 w-20 sm:w-24 md:w-32 lg:w-36 xl:w-40 2xl:w-48 h-1 bg-blue-600 rounded-full"></span>
+
         </h1>
    <button
   onClick={() => navigate("/dashboard/items/add")}
