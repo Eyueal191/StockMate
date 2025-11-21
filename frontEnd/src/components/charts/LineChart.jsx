@@ -75,7 +75,7 @@ function LineChart({ labels = [], dataPoints = [], title = "", borderColor = "rg
   };
 
   return (
-    <div className="w-full h-96 max-w-5xl mx-auto p-4 bg-white rounded-2xl shadow">
+    <div className="w-full min-h-[40vh] min-h-[60vh] mx-auto p-4 bg-white rounded-2xl shadow">
       <Line data={data} options={options} />
     </div>
   );

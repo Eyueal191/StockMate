@@ -1,4 +1,5 @@
-import { Bar } from 'react-chartjs-2';
+// src/components/charts/VerticalBarChart.jsx
+import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -7,60 +8,101 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
+} from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
-// Register ChartJS components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartDataLabels);
 
 function VerticalBarChart({ labels = [], values = [], title = "" }) {
+  const colors = [
+    "#2563EB", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6",
+    "#06B6D4", "#F43F5E", "#84CC16", "#D946EF", "#0EA5E9"
+  ];
+
+  const filtered = labels
+    .map((label, i) => ({ label, value: values[i] }))
+    .filter(item => typeof item.value === "number" && item.value > 0)
+    .sort((a, b) => b.value - a.value);
+
+  const sortedLabels = filtered.map(item => item.label);
+  const sortedValues = filtered.map(item => item.value);
+
+  const barWidth = 40; 
+  const dynamicWidth = Math.max(sortedLabels.length * barWidth, 400); 
+
   const data = {
-    labels,
+    labels: sortedLabels,
     datasets: [
       {
-        label: title,
-        data: values,
+        label: "Quantity Sold",
+        data: sortedValues,
+        backgroundColor: sortedValues.map((_, i) => colors[i % colors.length]),
+        borderColor: sortedValues.map((_, i) => colors[i % colors.length]),
         borderWidth: 1,
-        backgroundColor: 'rgba(54, 162, 235, 0.7)',
-        borderColor: 'rgba(54, 162, 235, 1)',
+        borderRadius: 4,
+        barThickness: 'flex',
+        maxBarThickness: 40,
       },
     ],
   };
 
   const options = {
-    indexAxis: 'x', // Vertical chart (default)
+    indexAxis: "x",
     responsive: true,
     maintainAspectRatio: false,
+    layout: { padding: { bottom: 20, left: 20 } },
     plugins: {
       legend: { display: false },
       title: {
         display: true,
         text: title,
+        align: "start",
+        color: "#2563EB",
+        font: { weight: "bold", size: 18 },
+        padding: { top: 10, bottom: 20 },
       },
       tooltip: {
-        enabled: true,
+        backgroundColor: "rgba(30, 41, 59, 0.9)",
+        titleColor: "#fff",
+        bodyColor: "#e5e7eb",
+        borderWidth: 1,
+        borderColor: "#475569",
+        padding: 10,
       },
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+        color: '#000',
+        font: (context) => {
+          const barWidth = context.chart.getDatasetMeta(0).data[context.dataIndex].width;
+          return { size: Math.max(12, Math.min(barWidth * 0.4, 16)), weight: 'bold' };
+        },
+        formatter: (value) => value,
+      }
     },
     scales: {
       x: {
         grid: { display: false },
+        ticks: { color: "#374151", font: { size: 14 }, stepSize: 1 },
       },
       y: {
         beginAtZero: true,
-        grid: { display: true },
+        grid: { color: "rgba(156,163,175,0.2)" },
+        ticks: { color: "#374151", font: { size: 14, weight: 500 } },
       },
     },
   };
 
   return (
-    <div className="w-full h-96 max-w-4xl mx-auto p-4 bg-white rounded-2xl shadow">
-      <Bar data={data} options={options} />
+    <div
+      className="overflow-x-auto overflow-y-auto rounded-lg p-2 w-full h-full max-h-[60vh]"
+    >
+      <div
+        className="bg-white rounded-2xl shadow-lg p-6 w-full h-full min-h-[300px]"
+        style={{ width: dynamicWidth }}
+      >
+        <Bar data={data} options={options} plugins={[ChartDataLabels]} />
+      </div>
     </div>
   );
 }

@@ -72,11 +72,11 @@ function DashBoard() {
           {/* Desktop: search on top, sidebar left, main right */}
           <div className="hidden md:flex md:flex-col w-full h-full">
             {/* SearchBar without padding */}
-            <div className="w-full">
-              <Suspense fallback={<Loading />}>
-                <SearchBar />
-              </Suspense>
-            </div>
+            <div className="w-full bg-white shadow-sm border border-gray-200 py-6 px-4 md:px-6">
+  <Suspense fallback={<Loading />}>
+    <SearchBar />
+  </Suspense>
+</div>
 
             {/* Divider line below search bar */}
             <div className="h-px w-full bg-gray-300" />
