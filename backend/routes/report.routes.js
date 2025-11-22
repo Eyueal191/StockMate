@@ -11,13 +11,28 @@ import {
 
 const reportRoutes = express.Router();
 
-// Sales Reports
+/* ------------------------------
+   📌 ROUTES FOR ALL USERS (STAFF)
+   ------------------------------ */
+
+// General sales reports
 reportRoutes.get("/sales-by-item", getSalesByItem);
 reportRoutes.get("/sales-by-date", getSalesByDate);
 reportRoutes.get("/sales-by-category", getSalesByCategory);
-reportRoutes.get("/sales-overview", getSalesOverview);
+
+// Inventory checks
 reportRoutes.get("/top-items", getTopItems);
 reportRoutes.get("/low-stock-items", getLowStockItems);
+
+
+/* ------------------------------
+   🔒 ADMIN-ONLY REPORTS
+   ------------------------------ */
+
+// Financial summary & business KPIs
+reportRoutes.get("/sales-overview", getSalesOverview);
+
+// Revenue, profit, and advanced analytics
 reportRoutes.get("/revenue-analytics", getRevenueAnalytics);
 
 export default reportRoutes;

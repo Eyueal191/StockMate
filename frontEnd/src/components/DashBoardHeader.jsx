@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { User, LogOut, Menu, X } from "lucide-react";
 import logo from "../assets/logo.png";
-
+import Axios from "../axios/axios.config.js";
 function DashboardHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
@@ -10,10 +10,18 @@ function DashboardHeader() {
 
   const toggleMobileMenu = () => setMobileOpen(!mobileOpen);
 
-  const logOut = () => {
-    localStorage.removeItem("accessToken");
-    navigate("/login");
-  };
+ const logOut = async () => {
+  try {
+    const res = await Axios.get("/api/user/logout");
+
+    if (res.data.success) {
+      localStorage.removeItem("IsLoggedIn"); // ✅ This works
+      navigate("/login");
+    }
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
+};
 
   const getLinkClass = (path) =>
     `px-4 py-2 rounded-md transition-all text-sm sm:text-base md:text-lg lg:text-xl focus:outline-none focus:ring-2 focus:ring-blue-400 hover:bg-gray-700 border-b-2 ${

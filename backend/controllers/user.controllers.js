@@ -1,8 +1,6 @@
 import sendEmail from "../config/resend.js";
 import User from "../models/user.js";
 import generateAccessToken from "../utility/generateAccessToken.js";
-import verifyRefreshToken from "../utility/verfiyRefreshToken.js";
-import generateRefreshToken from "../utility/generateRefreshToken.js";
 import verifyAccessToken from "../utility/verifyAccessToken.js";
 import  hashPassword from "../utility/hashPassword.js"
 import otpTemplate from "../utility/otpTemplate.js";
@@ -119,7 +117,7 @@ const resendEmailOtp = async (req, res, next) => {
 const logIn = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    // Find user by email
+    // 1. Find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({
@@ -128,7 +126,8 @@ const logIn = async (req, res, next) => {
         error: true,
       });
     }
-    // Check password
+
+    // 2. Check password
     const isPasswordCorrect = await comparePassword(password, user.password);
     if (!isPasswordCorrect) {
       return res.status(400).json({
@@ -137,31 +136,33 @@ const logIn = async (req, res, next) => {
         error: true,
       });
     }
-    // Generate tokens
+
+    // 3. Generate access token (short-lived)
     const accessToken = await generateAccessToken(user._id);
-    const refreshToken = await generateRefreshToken(user._id);
-    // Save tokens in user document
-    user.accessToken = accessToken;
-    user.refreshToken = refreshToken;
-    await user.save();
-    // Set refresh token in HTTP-only cookie
+
+    // 4. Set access token in httpOnly cookie
     const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // true if HTTPS
-      sameSite: "None",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      httpOnly: true,                                   // JS cannot access
+      secure: process.env.NODE_ENV === "production",   // HTTPS only in production
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Lax for localhost
+      maxAge: 15 * 60 * 1000,                          // 15 minutes
+      path: "/",                                       // available site-wide
     };
-    res.cookie("refreshToken", refreshToken, cookieOptions);
+    res.cookie("accessToken", accessToken, cookieOptions);
+    // 5. Send success response (no token in JSON, cookie already sent)
     return res.status(200).json({
       message: "Logged in successfully",
-      error: false,
       success: true,
-      accessToken,
+      error: false,
+      isLoggedIn: true,
     });
+
   } catch (err) {
     next(err);
   }
 };
+
+
 // 4. Forgot Password OTP
 const forgotPasswordOtp = async (req, res, next) => {
   try {
@@ -241,27 +242,6 @@ const verifyPasswordOtp = async (req, res, next) => {
     next(err);
   }
 };
-// 6. Refresh Access Token
-const refreshAccessToken = async (req, res, next) => {
-  try {
-    const refreshToken = res.cookies;
-    let user = await user.finOne({refreshToken})
-     if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-        success: false,
-        error: true,
-      });
-    }
-    let accessToken =  generateAccessToken(user._id);
-    let newRefreshToken = generateRefreshToken(user._id);
-    user.accessToken=accessToken;
-    user.refreshToken=newRefreshToken;
-    return res.status(201).json({ message: "Refresh Access Token endpoint" });
-  } catch (err) {
-    next(err);
-  }
-};
 // 7. Password Reset
 const passwordReset = async (req, res, next) => {
   try {
@@ -289,7 +269,61 @@ const passwordReset = async (req, res, next) => {
     next(err);
   }
 };
+// 8. logOut 
+const logOut = async (req, res) => {
+  // Clear the accessToken cookie
+  res.cookie("accessToken", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    expires: new Date(0), // Expire immediately
+  });
 
+  return res.status(200).json({
+    message: "Logged out successfully",
+    success: true,
+    error: false,
+  });
+};
+// 9. getUsersList
+const getUsersList = async (req, res, next) => {
+  try {
+    let users = await User.find({})
+    return res.status(200).json({message:"User's List has been retrieved successfully", error:false, success:true,users})
+  
+  } catch (error) {
+    next()
+  }
+}
+// 10. updateUser
+const updateUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    let user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Unregistered user",
+        success: false,
+        error: true,
+      });
+    }
+
+    Object.assign(user, req.body);
+    await user.save();
+
+    return res.status(200).json({
+      message: "User has been updated successfully",
+      success: true,
+      error: false,
+      user,
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
 export {
   signUp,
   logIn,
@@ -297,6 +331,7 @@ export {
   resendEmailOtp,
   forgotPasswordOtp,
   verifyPasswordOtp,
-  refreshAccessToken,
   passwordReset,
+  logOut,
+  getUsersList,updateUser
 };

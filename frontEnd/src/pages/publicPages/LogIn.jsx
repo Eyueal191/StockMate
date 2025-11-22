@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Axios from "../../axios/axios.config.js";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
-
+import userApiSummary from "../../api/userApiSummary.js";
 function LogIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,7 +21,7 @@ function LogIn() {
 
       if (data.success) {
         toast.success(data.message);
-        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("IsLoggedIn", "true");
         navigate("/dashboard");
       } else {
         toast.error(data.message || "Login failed");
@@ -53,10 +53,10 @@ function LogIn() {
           Enter your credentials to access your account
         </p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
           {/* Email Input */}
           <label className="text-sm sm:text-base md:text-lg font-semibold text-gray-700">
-            Email Address
+            Email Address:
           </label>
           <input
             type="email"
@@ -68,8 +68,8 @@ function LogIn() {
           />
 
           {/* Password Input */}
-          <label className="text-sm sm:text-base md:text-lg font-semibold text-gray-700">
-            Password
+          <label className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 mt-2">
+            Password:
           </label>
           <div className="relative">
             <input

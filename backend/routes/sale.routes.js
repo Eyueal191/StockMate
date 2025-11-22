@@ -1,5 +1,11 @@
 import express from "express";
-import { addSale, getSales, updateSale, deleteSale, getSaleById } from "../controllers/sale.controllers.js";
+import { 
+  addSale, 
+  getSales, 
+  updateSale, 
+  deleteSale, 
+  getSaleById 
+} from "../controllers/sale.controllers.js";
 
 const saleRoutes = express.Router();
 

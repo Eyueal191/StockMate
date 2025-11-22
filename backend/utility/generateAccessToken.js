@@ -6,9 +6,8 @@ const generateAccessToken = (userId) => {
   const accessToken = jwt.sign(
     { id: userId }, // payload
     process.env.SECRET_KEY_ACCESS_TOKEN, // secret from .env
-    { expiresIn: "4d" } // token expiration: 4 days
+    { expiresIn: "1d" } 
   );
   return accessToken;
 };
-
 export default generateAccessToken;

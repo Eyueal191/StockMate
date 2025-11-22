@@ -1,4 +1,4 @@
-export const API = {
+const userApiSummary = {
   baseURL: "http://localhost:8000",
   endpoints: {
     signUp: {
@@ -29,9 +29,6 @@ export const API = {
       method: "PUT",
       url: "/api/user/password-reset",
     },
-    refreshAccessToken: {
-      method: "GET",
-      url: "/api/user/refresh-access-token",
-    },
   },
 };
+export default userApiSummary;

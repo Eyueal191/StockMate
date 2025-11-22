@@ -16,7 +16,8 @@ const addItem = async (req, res, next) => {
   });
 }
     const category = await Category.findOne({name:itemData.category});
-    const item = await Item.create({ ...itemData, image, category:category._id});
+    const payload = image ? {image, category:category._id}:{category:category._id}
+    const item = await Item.create({ ...itemData,...payload});
     res.status(200).json({
       message: "Item added successfully",
       success: true,

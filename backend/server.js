@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
-
+import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import rootRoute from "./routes/barrel.js";
 import globalErrorHandler from "./middlewares/GlobalErrorHandler.js";
@@ -11,7 +11,7 @@ import globalErrorHandler from "./middlewares/GlobalErrorHandler.js";
 dotenv.config();
 
 const app = express();
-
+app.use(cookieParser())
 // Middleware
 app.use(express.json());       // Parse JSON requests
 app.use(
