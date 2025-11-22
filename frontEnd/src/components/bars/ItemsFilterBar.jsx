@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import Axios from "../../axios/axios.config.js";
 import { Tag, Filter } from "lucide-react";
 import { StockContext } from "../../stockContext/StockContext.jsx";
-
+import Loading from "../../components/Loading.jsx"
 function ItemsFilterBar() {
   const { selectedCategories, setSelectedCategories } = useContext(StockContext);
   const [categories, setCategories] = useState([]);
@@ -46,7 +46,7 @@ function ItemsFilterBar() {
   };
 
   const allCategories = [{ _id: "all", name: "" }, ...categories];
-
+ if(categories.length===0) return <Loading/>
   return (
     <div
       className={`

@@ -2,22 +2,24 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/Loading.jsx";
 
-function ItemCard({ product }) {
+function ItemCard({ product="Loading" }) {
   const navigate = useNavigate();
   const { _id, name, description, price, stock, image, category } = product;
 
   const stockClass = stock > 0 ? "text-green-400" : "text-red-400";
-
+if(product==="Loading") return <Loading/>
   return (
     <div
       className="
         bg-gray-800 shadow-lg rounded-2xl overflow-hidden
         flex flex-col
-        h-[580px] w-[500px] md:w-[360px] lg:w-[420px] xl:[450px] mx-auto
+        w-full max-w-[440px] aspect-square
         p-4
         transition-shadow duration-300
         hover:shadow-2xl
-      "
+        mx-auto
+        h-[520px] sm:h-[500px]
+        "
     >
       {/* Product Image */}
       {image ? (

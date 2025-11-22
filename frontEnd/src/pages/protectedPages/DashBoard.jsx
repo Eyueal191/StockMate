@@ -12,56 +12,69 @@ const SaleNavBar = lazy(() => import("../../components/bars/SaleNavBar.jsx"));
 function DashBoard() {
   const location = useLocation();
 
-  const isItemsPage = location.pathname === "/dashboard" || location.pathname === "/dashboard/items";
+  const isItemsPage =
+    location.pathname === "/dashboard" || location.pathname === "/dashboard/items";
   const isCategoriesPage = location.pathname.includes("/categories");
   const isSalesPage =
     location.pathname === "/dashboad/sales" || location.pathname === "/dashboard/sales/add";
 
-  // Pages without sidebar/search
+  /** ------------------ Pages without sidebar / search ------------------ */
   if (!isItemsPage && !isCategoriesPage && ~isSalesPage) {
     return (
-      <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
-        <Suspense fallback={<Loading />}>
-          <DashBoardHeader />
-        </Suspense>
+      <div className="flex flex-col min-h-screen bg-gray-100 overflow-hidden">
+        
+        {/* Header */}
+        <div className="h-[15vh] shadow-md bg-white">
+          <Suspense fallback={<Loading />}>
+            <DashBoardHeader />
+          </Suspense>
+        </div>
 
-        <main className="flex-1 overflow-y-auto">
+        {/* Content */}
+        <main className="flex-1 min-h-[80vh] overflow-y-auto">
           <Suspense fallback={<Loading />}>
             <Outlet />
           </Suspense>
         </main>
 
-        <Suspense fallback={<Loading />}>
-          <DashBoardFooter />
-        </Suspense>
+        {/* Footer */}
+        <div className="h-[10vh] shadow-inner bg-white">
+          <Suspense fallback={<Loading />}>
+            <DashBoardFooter />
+          </Suspense>
+        </div>
+
       </div>
     );
   }
 
+  /** ------------------ With Sidebar / Search ------------------ */
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-100 overflow-hidden">
+
       {/* Header */}
-      <Suspense fallback={<Loading />}>
-        <DashBoardHeader />
-      </Suspense>
+      <div className="h-[15vh] shadow-md bg-white">
+        <Suspense fallback={<Loading />}>
+          <DashBoardHeader />
+        </Suspense>
+      </div>
 
       {/* Items Page */}
       {isItemsPage && (
-        <div className="flex flex-col w-full h-full">
-          {/* Mobile stacked */}
-          <div className="flex flex-col md:hidden w-full h-full">
+        <div className="flex flex-col w-full min-h-[80vh] flex-1">
+
+          {/* MOBILE LAYOUT */}
+          <div className="flex flex-col md:hidden w-full flex-1">
             <Suspense fallback={<Loading />}>
               <ItemsFilterBar />
             </Suspense>
 
-            {/* SearchBar without padding */}
-            <div className="w-full">
+            <div className="w-full py-6 px-4 md:px-6">
               <Suspense fallback={<Loading />}>
                 <SearchBar />
               </Suspense>
             </div>
 
-            {/* Divider line */}
             <div className="h-px w-full bg-gray-300" />
 
             <div className="flex-1 overflow-auto">
@@ -69,50 +82,42 @@ function DashBoard() {
             </div>
           </div>
 
-          {/* Desktop: search on top, sidebar left, main right */}
-          <div className="hidden md:flex md:flex-col w-full h-full">
-            {/* SearchBar without padding */}
-            <div className="w-full bg-white shadow-sm border border-gray-200 py-6 px-4 md:px-6">
-  <Suspense fallback={<Loading />}>
-    <SearchBar />
-  </Suspense>
-</div>
+          {/* DESKTOP LAYOUT */}
+          <div className="hidden md:flex md:flex-col w-full flex-1">
+            <div className="w-full bg-white shadow-sm border-b border-gray-200 py-6 px-4 md:px-6">
+              <Suspense fallback={<Loading />}>
+                <SearchBar />
+              </Suspense>
+            </div>
 
-            {/* Divider line below search bar */}
-            <div className="h-px w-full bg-gray-300" />
-
-            <div className="flex flex-1 w-full h-full overflow-hidden">
-              {/* Sidebar left */}
+            <div className="flex flex-1 overflow-hidden">
               <div className="flex-shrink-0">
                 <Suspense fallback={<Loading />}>
                   <ItemsFilterBar />
                 </Suspense>
               </div>
 
-              {/* Vertical divider line between sidebar and main */}
               <div className="w-px bg-gray-300" />
 
-              {/* Main content */}
               <div className="flex-1 overflow-auto">
                 <Outlet />
               </div>
             </div>
           </div>
+
         </div>
       )}
 
       {/* Categories Page */}
       {isCategoriesPage && (
-        <div className="flex flex-col w-full h-full">
-          {/* Mobile stacked */}
-          <div className="md:hidden w-full">
-            <div>
-              <Suspense fallback={<Loading />}>
-                <CategoryNavBar />
-              </Suspense>
-            </div>
+        <div className="flex flex-col w-full min-h-[80vh] flex-1">
 
-            {/* Divider line */}
+          {/* Mobile */}
+          <div className="md:hidden w-full flex-1">
+            <Suspense fallback={<Loading />}>
+              <CategoryNavBar />
+            </Suspense>
+
             <div className="h-px w-full bg-gray-300" />
 
             <div className="flex-1 overflow-auto">
@@ -120,36 +125,34 @@ function DashBoard() {
             </div>
           </div>
 
-          {/* Desktop: sidebar left, main right */}
-          <div className="hidden md:flex flex-1 w-full h-full">
+          {/* Desktop */}
+          <div className="hidden md:flex w-full flex-1">
             <div className="flex-shrink-0">
               <Suspense fallback={<Loading />}>
                 <CategoryNavBar />
               </Suspense>
             </div>
 
-            {/* Vertical divider line */}
             <div className="w-px bg-gray-300" />
 
             <div className="flex-1 overflow-auto">
               <Outlet />
             </div>
           </div>
+
         </div>
       )}
 
-      {/* Sale Pages */}
+      {/* Sales Page */}
       {isSalesPage && (
-        <div className="flex flex-col w-full h-full">
-          {/* Mobile stacked */}
-          <div className="md:hidden w-full">
-            <div>
-              <Suspense fallback={<Loading />}>
-                <SaleNavBar />
-              </Suspense>
-            </div>
+        <div className="flex flex-col w-full min-h-[80vh] flex-1">
 
-            {/* Divider line */}
+          {/* Mobile */}
+          <div className="md:hidden w-full flex-1">
+            <Suspense fallback={<Loading />}>
+              <SaleNavBar />
+            </Suspense>
+
             <div className="h-px w-full bg-gray-300" />
 
             <div className="flex-1 overflow-auto">
@@ -157,28 +160,31 @@ function DashBoard() {
             </div>
           </div>
 
-          {/* Desktop: sidebar left, main right */}
-          <div className="hidden md:flex flex-1 w-full h-full">
+          {/* Desktop */}
+          <div className="hidden md:flex w-full flex-1">
             <div className="flex-shrink-0">
               <Suspense fallback={<Loading />}>
                 <CategoryNavBar />
               </Suspense>
             </div>
 
-            {/* Vertical divider line */}
             <div className="w-px bg-gray-300" />
 
             <div className="flex-1 overflow-auto">
               <Outlet />
             </div>
           </div>
+
         </div>
       )}
 
       {/* Footer */}
-      <Suspense fallback={<Loading />}>
-        <DashBoardFooter />
-      </Suspense>
+      <div className="h-[10vh] shadow-inner bg-white">
+        <Suspense fallback={<Loading />}>
+          <DashBoardFooter />
+        </Suspense>
+      </div>
+
     </div>
   );
 }

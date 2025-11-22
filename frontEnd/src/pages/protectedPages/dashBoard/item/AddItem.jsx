@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Axios from "../../../../axios/axios.config.js";
 import toast from "react-hot-toast";
+import Loading from "../../../../components/Loading.jsx";
 
 function AddItem() {
   const navigate = useNavigate();
@@ -72,8 +73,15 @@ function AddItem() {
   };
 
   return (
-    <div className="w-screen h-auto py-8 bg-gray-50 flex justify-center px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-xl bg-gray-800 rounded-2xl shadow-2xl border border-gray-400 p-6 sm:p-8">
+    <div className="w-screen h-auto py-8 bg-gray-50 flex justify-center px-4 sm:px-6 lg:px-8 relative">
+      
+      {loading && (
+        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 rounded-2xl">
+          <Loading />
+        </div>
+      )}
+
+      <div className="w-full max-w-xl bg-gray-800 rounded-2xl shadow-2xl border border-gray-400 p-6 sm:p-8 relative">
         
         {/* Header */}
         <h1 className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mb-6">
@@ -185,10 +193,10 @@ function AddItem() {
           <div className="mt-4">
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition disabled:bg-blue-400 text-[clamp(0.875rem,2vw,1rem)] sm:text-[clamp(1rem,1.5vw,1.125rem)]"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition disabled:bg-blue-400 text-[clamp(0.875rem,2vw,1rem)] sm:text-[clamp(1rem,1.5vw,1.125rem)] flex items-center justify-center"
               disabled={loading}
             >
-              {loading ? "Adding..." : "Add Item"}
+              {loading ? <Loading /> : "Add Item"}
             </button>
           </div>
 

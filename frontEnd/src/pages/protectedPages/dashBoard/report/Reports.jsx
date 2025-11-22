@@ -23,14 +23,14 @@ function Reports() {
       {/* Desktop & Tablet Layout (>=md) */}
       <div className="hidden md:flex w-full min-h-screen">
         {/* Sidebar */}
-        <aside className="w-84 bg-white border-r border-gray-200 min-h-screen">
+        <aside className="w-84 bg-white border border-gray-200 min-h-screen">
           <Suspense fallback={<div>Loading Navbar...</div>}>
             <ReportNavBar />
           </Suspense>
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 min-h-screen border">
+        <main className="flex-1 min-h-screen">
           <Outlet />
         </main>
       </div>

@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import ItemCard from "../../../../components/cards/ItemCard.jsx";
 import { useNavigate } from "react-router-dom";
-
+import Loading from "../../../../components/Loading.jsx";
 function ItemsList() {
   const products = useSelector((state) => state.items.list) || [];
   const parentRef = useRef();
@@ -33,9 +33,13 @@ function ItemsList() {
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 600, // fixed row height
+    estimateSize: () =>{
+    if(columns>1) return 520;
+    return 540;
+    }, // fixed row height
     overscan: 3,
   });
+if(products.length === 0) return <Loading />
 
   return (
     <div className="p-4">

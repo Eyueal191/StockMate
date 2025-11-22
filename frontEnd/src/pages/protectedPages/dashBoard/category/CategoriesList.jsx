@@ -2,6 +2,7 @@ import React, { useState, useEffect, lazy, Suspense } from "react";
 import Axios from "../../../../axios/axios.config.js";
 import { ClipboardList } from "lucide-react"; // scalable icon
 import { useNavigate } from "react-router-dom";
+import Loading from "../../../../components/Loading.jsx";
 
 const CategoryCard = lazy(() =>
   import("../../../../components/cards/categoryCard.jsx")
@@ -33,7 +34,7 @@ const CategoriesList = () => {
   useEffect(() => {
     getCategories();
   }, []);
-
+if(categories.length===0) return <Loading/>
   return (
     <div className="h-full w-full bg-gray-50 p-4 sm:p-6 flex flex-col items-center">
       <div className="bg-white shadow-2xl rounded-2xl w-[90%] max-w-[90%] p-6 sm:p-10 lg:p-12">

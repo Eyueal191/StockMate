@@ -66,7 +66,7 @@ function SaleCard({ sale }) {
             {sale.item.name}
           </h2>
           {sale.item.description && (
-            <p className="text-gray-600 text-sm sm:text-base md:text-lg line-clamp-3">
+            <p className="text-gray-600 text-sm sm:text-base md:text-lg line-clamp-2">
               {sale.item.description}
             </p>
           )}
