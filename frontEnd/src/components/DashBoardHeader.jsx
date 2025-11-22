@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { User, LogOut, Menu, X } from "lucide-react";
 import logo from "../assets/logo.png";
 import Axios from "../axios/axios.config.js";
-function DashboardHeader() {
+function DashBoardHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -145,4 +145,4 @@ function DashboardHeader() {
     </header>
   );
 }
-export default DashboardHeader;
+export default DashBoardHeader;

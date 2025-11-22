@@ -1,8 +1,9 @@
 import React, { lazy, Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Loading from "../../components/Loading.jsx";
-const DashboardHeader = lazy(() => import("../../components/DashboardHeader.jsx"));
-const DashboardFooter = lazy(() => import("../../components/DashboardFooter.jsx"));
+
+const DashBoardHeader = lazy(() => import("../../components/DashBoardHeader.jsx"));
+const DashBoardFooter = lazy(() => import("../../components/DashBoardFooter.jsx"));
 const CategoryNavBar = lazy(() => import("../../components/bars/CategoryNavBar.jsx"));
 const ItemsFilterBar = lazy(() => import("../../components/bars/ItemsFilterBar.jsx"));
 const SearchBar = lazy(() => import("../../components/bars/SearchBar.jsx"));
@@ -21,7 +22,7 @@ function DashBoard() {
     return (
       <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
         <Suspense fallback={<Loading />}>
-          <DashboardHeader />
+          <DashBoardHeader />
         </Suspense>
 
         <main className="flex-1 overflow-y-auto">
@@ -31,7 +32,7 @@ function DashBoard() {
         </main>
 
         <Suspense fallback={<Loading />}>
-          <DashboardFooter />
+          <DashBoardFooter />
         </Suspense>
       </div>
     );
@@ -41,7 +42,7 @@ function DashBoard() {
     <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
       {/* Header */}
       <Suspense fallback={<Loading />}>
-        <DashboardHeader />
+        <DashBoardHeader />
       </Suspense>
 
       {/* Items Page */}
@@ -176,7 +177,7 @@ function DashBoard() {
 
       {/* Footer */}
       <Suspense fallback={<Loading />}>
-        <DashboardFooter />
+        <DashBoardFooter />
       </Suspense>
     </div>
   );
