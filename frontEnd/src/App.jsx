@@ -4,7 +4,7 @@ import { Toaster } from "react-hot-toast";
 import Loading from "./components/Loading.jsx";
 
 // -------------------- Public Pages --------------------
-const Login = lazy(() => import("./pages/publicPages/Login.jsx"));
+const Login = lazy(() => import("./pages/publicPages/LogIn.jsx"));
 const Register = lazy(() => import("./pages/publicPages/SignUp.jsx"));
 const ForgotPassword = lazy(() => import("./pages/publicPages/ForgotPassword.jsx"));
 const VerifyEmailOTP = lazy(() => import("./pages/publicPages/VerifyEmailOTP.jsx"));
