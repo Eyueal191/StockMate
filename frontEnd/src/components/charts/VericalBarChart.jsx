@@ -1,19 +1,17 @@
-// src/components/charts/VerticalBarChart.jsx
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
-  Title,
   Tooltip,
   Legend,
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartDataLabels);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, ChartDataLabels);
 
-function VerticalBarChart({ labels = [], values = [], title = "" }) {
+function VerticalBarChart({ labels = [], values = [] }) {
   const colors = [
     "#2563EB", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6",
     "#06B6D4", "#F43F5E", "#84CC16", "#D946EF", "#0EA5E9"
@@ -27,9 +25,6 @@ function VerticalBarChart({ labels = [], values = [], title = "" }) {
   const sortedLabels = filtered.map(item => item.label);
   const sortedValues = filtered.map(item => item.value);
 
-  const barWidth = 40; 
-  const dynamicWidth = Math.max(sortedLabels.length * barWidth, 400); 
-
   const data = {
     labels: sortedLabels,
     datasets: [
@@ -37,11 +32,10 @@ function VerticalBarChart({ labels = [], values = [], title = "" }) {
         label: "Quantity Sold",
         data: sortedValues,
         backgroundColor: sortedValues.map((_, i) => colors[i % colors.length]),
-        borderColor: sortedValues.map((_, i) => colors[i % colors.length]),
-        borderWidth: 1,
         borderRadius: 4,
-        barThickness: 'flex',
-        maxBarThickness: 40,
+        borderWidth: 1,
+        barThickness: "flex",   
+        maxBarThickness: 42,
       },
     ],
   };
@@ -50,57 +44,53 @@ function VerticalBarChart({ labels = [], values = [], title = "" }) {
     indexAxis: "x",
     responsive: true,
     maintainAspectRatio: false,
-    layout: { padding: { bottom: 20, left: 20 } },
+
     plugins: {
       legend: { display: false },
-      title: {
-        display: true,
-        text: title,
-        align: "start",
-        color: "#2563EB",
-        font: { weight: "bold", size: 18 },
-        padding: { top: 10, bottom: 20 },
-      },
       tooltip: {
-        backgroundColor: "rgba(30, 41, 59, 0.9)",
+        backgroundColor: "rgba(30,41,59,0.9)",
         titleColor: "#fff",
         bodyColor: "#e5e7eb",
-        borderWidth: 1,
-        borderColor: "#475569",
-        padding: 10,
       },
       datalabels: {
-        anchor: 'end',
-        align: 'end',
-        color: '#000',
-        font: (context) => {
-          const barWidth = context.chart.getDatasetMeta(0).data[context.dataIndex].width;
-          return { size: Math.max(12, Math.min(barWidth * 0.4, 16)), weight: 'bold' };
+        anchor: "end",
+        align: "end",
+        color: "#000",
+        rotation: -45,
+        font: (ctx) => {
+          const barWidth =
+            ctx.chart.getDatasetMeta(0).data[ctx.dataIndex].width;
+          return { size: Math.max(10, Math.min(barWidth * 0.35, 14)), weight: "bold" };
         },
         formatter: (value) => value,
-      }
+      },
     },
+
     scales: {
       x: {
         grid: { display: false },
-        ticks: { color: "#374151", font: { size: 14 }, stepSize: 1 },
+        ticks: {
+          color: "#374151",
+          maxRotation: 30,
+          minRotation: 0,
+          autoSkip: true,
+          autoSkipPadding: 20,
+        },
       },
       y: {
         beginAtZero: true,
         grid: { color: "rgba(156,163,175,0.2)" },
-        ticks: { color: "#374151", font: { size: 14, weight: 500 } },
+        ticks: {
+          color: "#374151",
+          font: { weight: 500 },
+        },
       },
     },
   };
 
   return (
-    <div
-      className="overflow-x-auto overflow-y-auto rounded-lg p-2 w-full h-full max-h-[60vh]"
-    >
-      <div
-        className="bg-white rounded-2xl shadow-lg p-6 w-full h-full min-h-[300px]"
-        style={{ width: dynamicWidth }}
-      >
+    <div className="w-full h-full overflow-x-auto rounded-lg p-2 max-h-[60vh]">
+      <div className="bg-white shadow-lg rounded-2xl p-6 w-full h-full min-w-[600px]">
         <Bar data={data} options={options} plugins={[ChartDataLabels]} />
       </div>
     </div>

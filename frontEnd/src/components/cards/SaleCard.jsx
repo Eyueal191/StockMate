@@ -4,6 +4,7 @@ import { StockContext } from "../../stockContext/StockContext.jsx";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Axios from "../../axios/axios.config.js"; // make sure path is correct
+import ImageIcon from "lucide-react/dist/esm/icons/image.js"; // imported icon
 
 function SaleCard({ sale }) {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ function SaleCard({ sale }) {
         />
       ) : (
         <div className="w-full h-[200px] bg-gray-200 rounded-t-2xl flex items-center justify-center text-gray-500">
-          No Image
+          <ImageIcon className="w-full h-full p-8 text-gray-400" />
         </div>
       )}
 
@@ -100,5 +101,4 @@ function SaleCard({ sale }) {
     </div>
   );
 }
-
 export default SaleCard;

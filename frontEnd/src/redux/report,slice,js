@@ -1,0 +1,61 @@
+// redux/reportSlice.js
+import { createSlice } from "@reduxjs/toolkit";
+
+// ✅ Initial state
+const initialState = {
+  salesOverview: null,      // Data for /dashboard/reports/sales-overview
+  salesByItem: null,        // Data for /dashboard/reports/sales-by-item
+  salesByCategory: null,    // Data for /dashboard/reports/sales-by-category
+  topItems: null,           // Data for /dashboard/reports/top-items
+  lowStock: null,           // Data for /dashboard/reports/low-stock
+  salesComparison: null,    // Data for /dashboard/reports/sales-comparison
+  revenueAnalytics: null,   // Data for /dashboard/reports/revenue-analytics
+};
+
+// ✅ Slice
+const reportSlice = createSlice({
+  name: "reports",
+  initialState,
+  reducers: {
+    // Set data for each report individually
+    setSalesOverview: (state, action) => {
+      state.salesOverview = action.payload;
+    },
+    setSalesByItem: (state, action) => {
+      state.salesByItem = action.payload;
+    },
+    setSalesByCategory: (state, action) => {
+      state.salesByCategory = action.payload;
+    },
+    setTopItems: (state, action) => {
+      state.topItems = action.payload;
+    },
+    setLowStock: (state, action) => {
+      state.lowStock = action.payload;
+    },
+    setSalesComparison: (state, action) => {
+      state.salesComparison = action.payload;
+    },
+    setRevenueAnalytics: (state, action) => {
+      state.revenueAnalytics = action.payload;
+    },
+    // Optional: reset all reports
+    clearReports: (state) => {
+      Object.keys(state).forEach(key => state[key] = null);
+    },
+  },
+});
+
+// ✅ Exports
+export const {
+  setSalesOverview,
+  setSalesByItem,
+  setSalesByCategory,
+  setTopItems,
+  setLowStock,
+  setSalesComparison,
+  setRevenueAnalytics,
+  clearReports,
+} = reportSlice.actions;
+
+export default reportSlice.reducer;

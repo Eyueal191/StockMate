@@ -42,7 +42,7 @@ const SalesByItem = lazy(() => import("./pages/protectedPages/dashBoard/report/S
 const SalesByCategory = lazy(() => import("./pages/protectedPages/dashBoard/report/SalesByCategory.jsx"));
 const TopItems = lazy(() => import("./pages/protectedPages/dashBoard/report/TopItems.jsx"));
 const LowStock = lazy(() => import("./pages/protectedPages/dashBoard/report/LowStock.jsx"));
-const SalesComparison = lazy(() => import("./pages/protectedPages/dashBoard/report/SalesComparison.jsx"));
+const SalesByDate = lazy(()=> import("./pages/protectedPages/dashBoard/report/SalesByDate.jsx"));
 const RevenueAnalytics = lazy(() => import("./pages/protectedPages/dashBoard/report/RevenueAnalytics.jsx"));
 
 function App() {
@@ -102,10 +102,9 @@ function App() {
               <Route path="sales-by-category" element={<SalesByCategory />} />
               <Route path="top-items" element={<TopItems />} />
               <Route path="low-stock" element={<LowStock />} />
-              <Route path="sales-comparison" element={<SalesComparison />} />
               <Route path="revenue-analytics" element={<RevenueAnalytics />} />
+              <Route path="sales-by-date" element={<SalesByDate />}/>
             </Route>
-
           </Route>
         </Routes>
       </Suspense>

@@ -4,16 +4,15 @@ import {
   CategoryScale,
   LinearScale,
   BarElement,
-  Title,
   Tooltip,
   Legend,
 } from "chart.js";
 
 import ChartDataLabels from "chartjs-plugin-datalabels";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartDataLabels);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, ChartDataLabels);
 
-function HorizontalBarChart({ labels = [], values = [], title = "" }) {
+function HorizontalBarChart({ labels = [], values = [] }) {
   const colors = [
     "#2563EB", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6",
     "#06B6D4", "#F43F5E", "#84CC16", "#D946EF", "#0EA5E9"
@@ -56,14 +55,6 @@ function HorizontalBarChart({ labels = [], values = [], title = "" }) {
     layout: { padding: { right: 20 } },
     plugins: {
       legend: { display: false },
-      title: {
-        display: true,
-        text: title,
-        align: "start",
-        color: "#2563EB",
-        font: { weight: "bold", size: 18 },
-        padding: { top: 10, bottom: 20 },
-      },
       tooltip: {
         backgroundColor: "rgba(30, 41, 59, 0.9)",
         titleColor: "#fff",
@@ -118,5 +109,4 @@ function HorizontalBarChart({ labels = [], values = [], title = "" }) {
     </div>
   );
 }
-
 export default HorizontalBarChart;

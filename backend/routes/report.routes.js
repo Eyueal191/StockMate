@@ -6,7 +6,6 @@ import {
   getSalesOverview,
   getTopItems,
   getLowStockItems,
-  getSalesComparison,
   getRevenueAnalytics,
 } from "../controllers/report.controllers.js";
 
@@ -19,7 +18,6 @@ reportRoutes.get("/sales-by-category", getSalesByCategory);
 reportRoutes.get("/sales-overview", getSalesOverview);
 reportRoutes.get("/top-items", getTopItems);
 reportRoutes.get("/low-stock-items", getLowStockItems);
-reportRoutes.get("/sales-comparison", getSalesComparison);
 reportRoutes.get("/revenue-analytics", getRevenueAnalytics);
 
 export default reportRoutes;

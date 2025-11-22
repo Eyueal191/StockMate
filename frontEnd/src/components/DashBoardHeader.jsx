@@ -20,8 +20,8 @@ function DashboardHeader() {
       location.pathname === path ? "border-blue-400 font-semibold" : "border-transparent"
     } text-white`;
 
-  // Products link active logic
-  const getProductsLinkClass = () => {
+  // Items link active logic
+  const getItemsLinkClass = () => {
     const currentPath = location.pathname.replace(/\/$/, "");
     const activePaths = ["/dashboard", "/dashboard/items"];
     const isActive = activePaths.includes(currentPath);
@@ -42,8 +42,11 @@ function DashboardHeader() {
 
         {/* Desktop / Tablet Links */}
         <div className="hidden md:flex flex-1 justify-center max-w-3xl gap-10 xl:gap-16 2xl:gap-20">
-          <NavLink to="/dashboard/items" className={getProductsLinkClass()}>
-            Products
+          <NavLink to="/dashboard/reports" className={getLinkClass("/dashboard/reports")}>
+            Report
+          </NavLink>
+          <NavLink to="/dashboard/items" className={getItemsLinkClass()}>
+            Items
           </NavLink>
           <NavLink to="/dashboard/sales" className={getLinkClass("/dashboard/sales")}>
             Sales
@@ -51,23 +54,20 @@ function DashboardHeader() {
           <NavLink to="/dashboard/categories" className={getLinkClass("/dashboard/categories")}>
             Category
           </NavLink>
-          <NavLink to="/dashboard/reports" className={getLinkClass("/dashboard/reports")}>
-            Report
-          </NavLink>
         </div>
 
         {/* Right account/logout & mobile toggle */}
         <div className="flex items-center gap-4">
           <NavLink
             to="/dashboard/account"
-            className="flex items-center gap-1 px-3 py-2 rounded-md hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base md:text-lg lg:text-xl text-white"
+            className="flex items-center gap-1 px-3 py-2 rounded-md hover:bg-gray-700 transition-colors text-sm sm:text-base md:text-lg lg:text-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-white"
           >
             <User size={18} />
             Account
           </NavLink>
           <button
             onClick={logOut}
-            className="flex items-center gap-1 px-3 py-2 rounded-md hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base md:text-lg lg:text-xl text-white"
+            className="flex items-center gap-1 px-3 py-2 rounded-md hover:bg-gray-700 transition-colors text-sm sm:text-base md:text-lg lg:text-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-white"
           >
             <LogOut size={18} />
             Logout
@@ -86,11 +86,18 @@ function DashboardHeader() {
         {mobileOpen && (
           <div className="absolute top-full left-0 w-full bg-gray-900 flex flex-col gap-2 p-4 md:hidden z-50 border-t border-gray-700">
             <NavLink
-              to="/dashboard/items"
-              className={getProductsLinkClass()}
+              to="/dashboard/reports"
+              className={getLinkClass("/dashboard/reports")}
               onClick={() => setMobileOpen(false)}
             >
-              Products
+              Report
+            </NavLink>
+            <NavLink
+              to="/dashboard/items"
+              className={getItemsLinkClass()}
+              onClick={() => setMobileOpen(false)}
+            >
+              Items
             </NavLink>
             <NavLink
               to="/dashboard/sales"
@@ -107,15 +114,8 @@ function DashboardHeader() {
               Category
             </NavLink>
             <NavLink
-              to="/dashboard/reports"
-              className={getLinkClass("/dashboard/reports")}
-              onClick={() => setMobileOpen(false)}
-            >
-              Report
-            </NavLink>
-            <NavLink
               to="/dashboard/account"
-              className="flex items-center gap-1 px-3 py-2 rounded-md hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 text-white"
+              className="flex items-center gap-1 px-3 py-2 rounded-md hover:bg-gray-700 transition-colors text-sm sm:text-base md:text-lg lg:text-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-white"
               onClick={() => setMobileOpen(false)}
             >
               <User size={18} />
@@ -126,7 +126,7 @@ function DashboardHeader() {
                 logOut();
                 setMobileOpen(false);
               }}
-              className="flex items-center gap-1 px-3 py-2 rounded-md hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 text-white"
+              className="flex items-center gap-1 px-3 py-2 rounded-md hover:bg-gray-700 transition-colors text-sm sm:text-base md:text-lg lg:text-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-white"
             >
               <LogOut size={18} />
               Logout
@@ -137,5 +137,4 @@ function DashboardHeader() {
     </header>
   );
 }
-
 export default DashboardHeader;
