@@ -1,7 +1,7 @@
 import React from "react";
 import logo from "../assets/logo.png";
 
-function DashBoardFooter() {
+function DashboardFooter() {
   return (
     <footer className="bg-gray-800 text-white shadow-inner mt-auto">
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 p-4">
@@ -20,4 +20,4 @@ function DashBoardFooter() {
     </footer>
   );
 }
-export default DashBoardFooter;
+export default DashboardFooter;

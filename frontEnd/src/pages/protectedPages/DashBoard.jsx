@@ -1,7 +1,6 @@
 import React, { lazy, Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Loading from "../../components/Loading.jsx";
-
 const DashboardHeader = lazy(() => import("../../components/DashboardHeader.jsx"));
 const DashboardFooter = lazy(() => import("../../components/DashboardFooter.jsx"));
 const CategoryNavBar = lazy(() => import("../../components/bars/CategoryNavBar.jsx"));
