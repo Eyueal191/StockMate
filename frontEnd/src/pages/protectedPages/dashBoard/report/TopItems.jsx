@@ -2,32 +2,51 @@ import React, { useState, useEffect, lazy, Suspense } from "react";
 import Loading from "../../../../components/Loading.jsx";
 import Axios from "../../../../axios/axios.config.js";
 
-// Lazy load the HorizontalBarChart
-const HorizontalBarChart = lazy(() =>
-  import("../../../../components/charts/HorizontalBarChart.jsx")
+
+// Lazy load the VerticalBarChart
+const VerticalBarChart = lazy(() =>
+  import("../../../../components/charts/VericalBarChart.jsx")
 );
 
 function TopItems() {
   const [report, setReport] = useState([]);
+  const [loadingData, setLoadingData] = useState(true);
 
-  // Map backend data to chart labels and values
-  const labels = report.map((r) => r.name);
-  const values = report.map((r) => r.sale);
-
+  // Fetch report from backend
   const getReport = async () => {
     try {
       const res = await Axios.get("/api/report/top-items");
-      if (res.data.success) {
-        setReport(res.data.report);
+      if (res.data.success && Array.isArray(res.data.report)) {
+        // Filter out invalid entries
+        const filtered = res.data.report.filter(
+          (item) =>
+            item.name &&
+            item.name.trim() !== "" &&
+            typeof item.sale === "number" &&
+            item.sale > 0
+        );
+        setReport(filtered);
       }
     } catch (error) {
-      console.log("Error Message:", error.message);
+      console.error("Error fetching top items:", error.message);
+    } finally {
+      setLoadingData(false);
     }
   };
 
   useEffect(() => {
     getReport();
   }, []);
+
+  // Build labels and values together from filtered report
+  const chartData = report.reduce(
+    (acc, item) => {
+      acc.labels.push(item.name);
+      acc.values.push(item.sale);
+      return acc;
+    },
+    { labels: [], values: [] }
+  );
 
   const title = "Top Selling Products by Quantity";
 
@@ -37,11 +56,24 @@ function TopItems() {
         Top Sale Items
       </h2>
 
-      {/* Scrollable chart wrapper */}
       <div className="w-full max-h-[80vh] overflow-y-auto overflow-x-auto rounded-2xl shadow bg-white px-4">
-        <Suspense fallback={<Loading />}>
-          <HorizontalBarChart labels={labels} values={values} title={title} />
-        </Suspense>
+        {loadingData ? (
+          <div className="flex justify-center items-center h-64">
+            <Loading />
+          </div>
+        ) : chartData.labels.length === 0 ? (
+          <div className="flex justify-center items-center h-64 text-gray-500">
+            No top-selling items to display.
+          </div>
+        ) : (
+          <Suspense fallback={<Loading />}>
+            <VerticalBarChart
+              labels={chartData.labels}
+              values={chartData.values}
+              title={title}
+            />
+          </Suspense>
+        )}
       </div>
     </div>
   );

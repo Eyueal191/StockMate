@@ -2,26 +2,33 @@ import React, { useState, useEffect, lazy, Suspense } from "react";
 import Loading from "../../../../components/Loading.jsx";
 import Axios from "../../../../axios/axios.config.js";
 
-// Lazy load the HorizontalBarChart
-const HorizontalBarChart = lazy(() =>
-  import("../../../../components/charts/HorizontalBarChart.jsx")
+// Lazy load the VerticalBarChart
+const VerticalBarChart = lazy(() =>
+  import("../../../../components/charts/VericalBarChart.jsx") // corrected typo
 );
 
 function LowStock() {
   const [lowStockItems, setLowStockItems] = useState([]);
-
-  // Map backend data to chart labels and values
-  const labels = lowStockItems.map((item) => item.name);
-  const values = lowStockItems.map((item) => item.stock);
+  const [loading, setLoading] = useState(true);
 
   const getLowStockItems = async () => {
     try {
       const res = await Axios.get("/api/report/low-stock-items");
-      if (res.data.success) {
-        setLowStockItems(res.data.lowStockItems);
+      if (res.data.success && Array.isArray(res.data.lowStockItems)) {
+        // Filter out invalid items
+        const filtered = res.data.lowStockItems.filter(
+          (item) =>
+            item.name &&
+            item.name.trim() !== "" &&
+            typeof item.stock === "number" &&
+            item.stock > 0
+        );
+        setLowStockItems(filtered);
       }
     } catch (error) {
-      console.log("Error Message:", error.message);
+      console.error("Error fetching low stock items:", error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -29,6 +36,8 @@ function LowStock() {
     getLowStockItems();
   }, []);
 
+  const labels = lowStockItems.map((item) => item.name);
+  const values = lowStockItems.map((item) => item.stock);
   const title = "Low Stock Products";
 
   return (
@@ -37,11 +46,20 @@ function LowStock() {
         Low Stock Items
       </h2>
 
-      {/* Scrollable chart wrapper */}
       <div className="w-full max-h-[80vh] overflow-y-auto overflow-x-auto rounded-2xl shadow bg-white px-4">
-        <Suspense fallback={<Loading />}>
-          <HorizontalBarChart labels={labels} values={values} title={title} />
-        </Suspense>
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <Loading />
+          </div>
+        ) : labels.length === 0 ? (
+          <div className="flex justify-center items-center h-64 text-gray-500">
+            No low stock items to display.
+          </div>
+        ) : (
+          <Suspense fallback={<Loading />}>
+            <VerticalBarChart labels={labels} values={values} title={title} />
+          </Suspense>
+        )}
       </div>
     </div>
   );

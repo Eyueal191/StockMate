@@ -7,7 +7,6 @@ import Loading from "../../../../components/Loading.jsx";
 const CategoryCard = lazy(() =>
   import("../../../../components/cards/categoryCard.jsx")
 );
-
 const CategoriesList = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
