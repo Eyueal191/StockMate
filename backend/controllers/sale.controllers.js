@@ -4,8 +4,7 @@ import Category from "../models/category.js"
 // 1. addSale.
 const addSale = async (req, res, next) => {
   try {
-    const data = req.body; // data = {name, quantity, seller}
-    // Find the item by name (case-insensitive)
+    const data = req.body;
     let item = await Item.findOne({ name: { $regex: data.name, $options: "i" } });
     if (!item) {
       return res.status(404).json({
