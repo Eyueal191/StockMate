@@ -141,7 +141,7 @@ function AddItem() {
             />
           </div>
 
-          {/* Category */}
+          {/* Category Dropdown */}
           <div className="flex flex-col">
             <label className="text-gray-100 font-semibold mb-1 text-[clamp(0.875rem,2vw,1rem)] sm:text-[clamp(1rem,1.5vw,1.125rem)]">
               Category:

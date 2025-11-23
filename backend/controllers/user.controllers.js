@@ -263,7 +263,6 @@ const passwordReset = async (req, res, next) => {
       message: "Your password has been changed successfully",
       error: false,
       success: true,
-      accessToken,
     });
   } catch (err) {
     next(err);

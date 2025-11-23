@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Axios from "../../../../axios/axios.config.js";
 import toast from "react-hot-toast";
+import StockContext from "../../../../stockContext/StockContext.jsx";
+import { useSelector } from "react-redux";
 
 function AddSale() {
   const navigate = useNavigate();
+  const products = useSelector((state) => state.items.list) || [];
 
-  // Keep key as "name" to match backend
   const [data, setData] = useState({
     name: "",
     quantity: "",
@@ -22,7 +24,6 @@ function AddSale() {
     e.preventDefault();
 
     try {
-      // Sending data directly to backend
       const res = await Axios.post("/api/sale", data);
 
       if (res.data.success) {
@@ -53,20 +54,27 @@ function AddSale() {
           {/* Form */}
           <form className="flex flex-col gap-4" onSubmit={handleAdd}>
 
-            {/* Item Name */}
+            {/* Item Name Dropdown */}
             <div className="flex flex-col">
               <label className="text-gray-100 font-semibold mb-1 text-[clamp(0.875rem,2vw,1rem)] sm:text-[clamp(1rem,1.5vw,1.125rem)]">
                 Item Name:
               </label>
-              <input
-                type="text"
+              <select
                 name="name"
-                placeholder="Insert name of the product"
                 value={data.name}
                 onChange={handleChange}
                 className="bg-gray-100 border border-gray-300 rounded-lg p-2 text-gray-900 text-[clamp(0.875rem,2vw,1rem)] sm:text-[clamp(1rem,1.5vw,1.125rem)] focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
                 required
-              />
+              >
+                <option value="" disabled>
+                  Select a product
+                </option>
+                {products.map((product) => (
+                  <option key={product.id} value={product.name}>
+                    {product.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Quantity */}
@@ -78,7 +86,7 @@ function AddSale() {
                 type="number"
                 name="quantity"
                 value={data.quantity}
-                placeholder="Insert soldItem's quantity"
+                placeholder="Insert sold item's quantity"
                 onChange={handleChange}
                 className="bg-gray-100 border border-gray-300 rounded-lg p-2 text-gray-900 text-[clamp(0.875rem,2vw,1rem)] sm:text-[clamp(1rem,1.5vw,1.125rem)] focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
                 required
@@ -117,4 +125,5 @@ function AddSale() {
     </div>
   );
 }
+
 export default AddSale;
