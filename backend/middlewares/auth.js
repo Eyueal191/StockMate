@@ -48,7 +48,7 @@ const authenticateUser = async (req, res, next) => {
 
     req.user = user;
 
-    if (user.role === "admin" || user.adminRoleGranted) {
+    if (user.role === "Admin" || user.adminRoleGranted) {
       req.isAdmin = true;
     }
 

@@ -7,21 +7,39 @@ import {
   getSaleById 
 } from "../controllers/sale.controllers.js";
 
+import { authenticateUser, authorizeAdmin } from "../middlewares/auth.js";
+import { sanitizeSale } from "../middlewares/sanitizers/sanitizeSale.js";
+import { validateSale } from "../middlewares/validators/validateSale.js";
 const saleRoutes = express.Router();
 
-// Create a new sale
-saleRoutes.post("/", addSale);
+/* ------------------------------
+   📌 SALES ROUTES
+   ------------------------------ */
 
-// Get all sales
-saleRoutes.get("/", getSales);
+// Create a new sale (authenticated staff)
+saleRoutes.post(
+  "/", 
+  authenticateUser,          // Must be logged in
+  sanitizeSale,              // Sanitize input
+  validateSale,              // Validate input
+  addSale
+);
 
-// Get single sale by ID
-saleRoutes.get("/:id", getSaleById);
+// Get all sales (authenticated staff)
+saleRoutes.get("/", authenticateUser, getSales);
 
-// Update sale by ID
-saleRoutes.put("/:id", updateSale);
+// Get single sale by ID (authenticated staff)
+saleRoutes.get("/:id", authenticateUser, getSaleById);
 
-// Delete sale by ID
-saleRoutes.delete("/:id", deleteSale);
+// Update sale by ID (admin-only)
+saleRoutes.put(
+  "/:id",
+  authenticateUser,
+  authorizeAdmin,
+  updateSale
+);
+
+// Delete sale by ID (admin-only)
+saleRoutes.delete("/:id", authenticateUser, authorizeAdmin, deleteSale);
 
 export default saleRoutes;

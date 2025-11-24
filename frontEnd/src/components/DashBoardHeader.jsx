@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { LogOut, Menu, X } from "lucide-react";
+import { LogOut, Menu, X, User } from "lucide-react"; // <-- added User icon
 import logo from "../assets/logo.png";
 import Axios from "../axios/axios.config.js";
 
@@ -13,11 +13,11 @@ function DashBoardHeader() {
 
   const logOut = async () => {
     try {
-      // NOTE: Axios import is assumed to be correctly configured for this app
       const res = await Axios.get("/api/user/logout");
 
       if (res.data.success) {
         localStorage.removeItem("IsLoggedIn");
+        localStorage.removeItem("userId");
         navigate("/login");
       }
     } catch (error) {
@@ -57,12 +57,8 @@ function DashBoardHeader() {
         h-24 sm:h-28 md:h-32 
         px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-20">
 
-        {/* LEFT SECTION: Mobile Menu Toggle (on mobile) and Logo.
-          The Menu button is now the first item in the flex container. 
-        */}
+        {/* LEFT SECTION */}
         <div className="flex items-center gap-4">
-          
-          {/* Menu Toggle (Moved to the left-most position, hidden on desktop) */}
           <button
             className="md:hidden p-2 rounded-md 
               hover:bg-gray-700/70 transition 
@@ -73,24 +69,21 @@ function DashBoardHeader() {
             {mobileOpen ? <X size={24} color="white" /> : <Menu size={24} color="white" />}
           </button>
 
-          {/* Logo */}
           <div className="flex-shrink-0">
             <NavLink to="/dashboard/items">
               <img
-                // NOTE: 'logo' import is assumed to be correctly resolved
                 src={logo}
                 alt="StockMate Logo"
-                className="h-12 sm:h-16 md:h-20 lg:h-24 drop-shadow-lg"
+                className="h-12 sm:h-16 md:h-20 drop-shadow-lg"
               />
             </NavLink>
           </div>
         </div>
 
-
-        {/* Desktop Links (Center) - Layout remains the same */}
+        {/* DESKTOP CENTER LINKS */}
         <div className="hidden md:flex flex-1 justify-center items-center 
-          max-w-3xl gap-10 xl:gap-16 2xl:gap-20">
-
+          max-w-4xl gap-10 xl:gap-12 2xl:gap-14">
+  
           <NavLink to="/dashboard/reports" className={getLinkClass("/dashboard/reports")}>
             Report
           </NavLink>
@@ -108,10 +101,19 @@ function DashBoardHeader() {
           </NavLink>
         </div>
 
-        {/* RIGHT SECTION: Only Logout button remains. 
-          The previous Account link and Hamburger button were removed/moved.
-        */}
+        {/* RIGHT SECTION (Account + Logout) */}
         <div className="flex items-center gap-4">
+
+          {/* ✅ Account Link with User Icon */}
+          <NavLink
+            to="/dashboard/account"
+            className={getLinkClass("/dashboard/account")}
+          >
+            <div className="flex items-center gap-1">
+              <User size={18} /> {/* User icon */}
+              <span>Account</span>
+            </div>
+          </NavLink>
 
           {/* Logout */}
           <button
@@ -129,7 +131,7 @@ function DashBoardHeader() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* MOBILE MENU */}
         {mobileOpen && (
           <div className="absolute top-full left-0 w-full bg-gray-900 
             flex flex-col gap-3 p-4 md:hidden z-50 
@@ -166,8 +168,18 @@ function DashBoardHeader() {
             >
               Category
             </NavLink>
-            
-            {/* Account mobile link removed */}
+
+            {/* ✅ Account with icon in mobile menu */}
+            <NavLink
+              to="/dashboard/account"
+              className={getLinkClass("/dashboard/account")}
+              onClick={() => setMobileOpen(false)}
+            >
+              <div className="flex items-center gap-1">
+                <User size={18} />
+                <span>Account</span>
+              </div>
+            </NavLink>
 
             {/* Logout mobile */}
             <button
@@ -192,5 +204,4 @@ function DashBoardHeader() {
     </header>
   );
 }
-
 export default DashBoardHeader;

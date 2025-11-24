@@ -2,10 +2,11 @@
 import React, { useEffect, useRef, useState, lazy, useContext } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { StockContext } from "../../../../stockContext/StockContext.jsx";
+
 const SaleCard = lazy(() => import("../../../../components/cards/SaleCard.jsx"));
 
 function SalesList() {
-  const { saleList } = useContext(StockContext); // use context sales
+  const { saleList, refetchSaleList } = useContext(StockContext); // use context sales
   const parentRef = useRef();
   const [columns, setColumns] = useState(1);
 
@@ -24,7 +25,18 @@ function SalesList() {
     return () => window.removeEventListener("resize", updateColumns);
   }, []);
 
-  const rowCount = Math.ceil(saleList.length / columns);
+  // Refetch sales on mount
+  useEffect(() => {
+    refetchSaleList();
+  }, []);
+
+  // Filter out invalid, deleted, or empty sales
+  const filteredSales = saleList.filter(
+    (sale) => sale && sale._id && Object.keys(sale).length > 0
+  );
+
+  const rowCount = Math.ceil(filteredSales.length / columns);
+
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => parentRef.current,
@@ -48,8 +60,8 @@ function SalesList() {
         >
           {rowVirtualizer.getVirtualItems().map((row) => {
             const start = row.index * columns;
-            const end = Math.min(start + columns, saleList.length);
-            const rowSales = saleList.slice(start, end);
+            const end = Math.min(start + columns, filteredSales.length);
+            const rowSales = filteredSales.slice(start, end);
 
             return (
               <div
@@ -77,5 +89,4 @@ function SalesList() {
     </div>
   );
 }
-
 export default SalesList;

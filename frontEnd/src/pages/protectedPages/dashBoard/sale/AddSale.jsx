@@ -2,18 +2,22 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Axios from "../../../../axios/axios.config.js";
 import toast from "react-hot-toast";
-import StockContext from "../../../../stockContext/StockContext.jsx";
 import { useSelector } from "react-redux";
+import Loading from "../../../../components/Loading.jsx";
+import { StockContext } from "../../../../stockContext/StockContext.jsx";
 
 function AddSale() {
   const navigate = useNavigate();
   const products = useSelector((state) => state.items.list) || [];
 
+  const {refetchSaleList } = useContext(StockContext); 
   const [data, setData] = useState({
     name: "",
     quantity: "",
     seller: "",
   });
+
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,55 +26,61 @@ function AddSale() {
 
   const handleAdd = async (e) => {
     e.preventDefault();
+    if (loading) return;
+
+    if (!data.name) {
+      toast.error("Please select a product");
+      return;
+    }
 
     try {
+      setLoading(true);
       const res = await Axios.post("/api/sale", data);
 
       if (res.data.success) {
         toast.success("Sale added successfully!");
-        navigate("/dashboard/sales");
+        await refetchSaleList()
+        setTimeout(()=>
+        navigate("/dashboard/sales"),1000)
       } else {
         toast.error(res.data.message || "Add failed.");
       }
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || "Error occurred.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="w-full h-full bg-gray-50">
-      <div className="w-full py-12 bg-gray-50 flex justify-center px-4 sm:px-6 lg:px-8">
-        <div className="border xl:mr-[37vw] w-full max-w-xl mx-auto bg-gray-800 rounded-2xl shadow-2xl border-gray-400 p-6 sm:p-8">
+      {loading && <Loading message="Processing sale..." />}
+      <div className="w-full py-12 flex justify-center px-4 sm:px-6 lg:px-8">
+        <div className="border w-full max-w-xl mx-auto bg-gray-800 rounded-2xl shadow-2xl border-gray-400 p-6 sm:p-8">
 
-          {/* Header */}
-          <h1 className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mb-6">
-            <span className="font-extrabold text-gray-100 text-[clamp(1.5rem,5vw,2.5rem)] sm:text-[clamp(1.75rem,4vw,2.25rem)]">
-              Record a New Sale
-            </span>
-            <span className="w-20 sm:w-28 h-1.5 mt-2 sm:mt-4 bg-gray-400 rounded-full"></span>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-6 border-b border-gray-700 pb-2">
+            Record a New Sale
           </h1>
 
-          {/* Form */}
           <form className="flex flex-col gap-4" onSubmit={handleAdd}>
 
-            {/* Item Name Dropdown */}
+            {/* Product Name Dropdown */}
             <div className="flex flex-col">
-              <label className="text-gray-100 font-semibold mb-1 text-[clamp(0.875rem,2vw,1rem)] sm:text-[clamp(1rem,1.5vw,1.125rem)]">
-                Item Name:
-              </label>
+              <label className="text-gray-100 font-semibold mb-1">Item Name:</label>
               <select
                 name="name"
                 value={data.name}
                 onChange={handleChange}
-                className="bg-gray-100 border border-gray-300 rounded-lg p-2 text-gray-900 text-[clamp(0.875rem,2vw,1rem)] sm:text-[clamp(1rem,1.5vw,1.125rem)] focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
+                className="bg-gray-100 text-gray-900 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 outline-none transition"
                 required
+                disabled={loading || products.length === 0}
               >
                 <option value="" disabled>
                   Select a product
                 </option>
                 {products.map((product) => (
-                  <option key={product.id} value={product.name}>
+                  <option key={product._id || product.id} value={product.name}>
                     {product.name}
                   </option>
                 ))}
@@ -79,43 +89,42 @@ function AddSale() {
 
             {/* Quantity */}
             <div className="flex flex-col">
-              <label className="text-gray-100 font-semibold mb-1 text-[clamp(0.875rem,2vw,1rem)] sm:text-[clamp(1rem,1.5vw,1.125rem)]">
-                Quantity:
-              </label>
+              <label className="text-gray-100 font-semibold mb-1">Quantity:</label>
               <input
                 type="number"
                 name="quantity"
                 value={data.quantity}
                 placeholder="Insert sold item's quantity"
                 onChange={handleChange}
-                className="bg-gray-100 border border-gray-300 rounded-lg p-2 text-gray-900 text-[clamp(0.875rem,2vw,1rem)] sm:text-[clamp(1rem,1.5vw,1.125rem)] focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
+                min="1"
                 required
-                min="0"
+                disabled={loading}
+                className="bg-gray-100 text-gray-900 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 outline-none transition"
               />
             </div>
 
             {/* Seller */}
             <div className="flex flex-col">
-              <label className="text-gray-100 font-semibold mb-1 text-[clamp(0.875rem,2vw,1rem)] sm:text-[clamp(1rem,1.5vw,1.125rem)]">
-                Seller:
-              </label>
+              <label className="text-gray-100 font-semibold mb-1">Seller:</label>
               <input
                 type="text"
                 name="seller"
                 value={data.seller}
                 placeholder="Insert seller's name"
                 onChange={handleChange}
-                className="bg-gray-100 border border-gray-300 rounded-lg p-2 text-gray-900 text-[clamp(0.875rem,2vw,1rem)] sm:text-[clamp(1rem,1.5vw,1.125rem)] focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
+                disabled={loading}
+                className="bg-gray-100 text-gray-900 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 outline-none transition"
               />
             </div>
 
-            {/* Submit Button */}
+            {/* Submit */}
             <div className="mt-4">
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition text-[clamp(0.875rem,2vw,1rem)] sm:text-[clamp(1rem,1.5vw,1.125rem)]"
+                disabled={loading}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition"
               >
-                Add Sale
+                {loading ? "Processing..." : "Add Sale"}
               </button>
             </div>
 

@@ -10,9 +10,11 @@ const userSchema = new mongoose.Schema(
     verified: { type: Boolean, default: false },
     forgotPasswordOTP: { type: Number },
     forgotPasswordOTPExpiryDate: { type: Date },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
+    role: { type: String, enum: ["Staff", "Admin"], default: "Staff"},
     staff: { type: Boolean },
-    adminRoleGranted: { type: Boolean },
+    adminRoleGranted: { type: Boolean, default: false },
+    phone: { type: String },
+    bio: { type: String },
   },
   { timestamps: true }
 );

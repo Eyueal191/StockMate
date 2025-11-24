@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import connectDB from "./config/db.js"; // your DB connection file
+import connectDB from "./config/db.js";
 import Sale from "./models/Sale.js";
 import Item from "./models/Item.js";
 
@@ -8,19 +8,16 @@ dotenv.config();
 
 const seedSales = async () => {
   try {
-    // Connect to MongoDB
     await connectDB();
 
-    // Body Care products
     const products = [
-      "Nivea Body Lotion",
-      "The Body Shop Body Scrub",
-      "Dove Shower Gel",
-      "L'Occitane Hand Cream",
-      "Burt's Bees Foot Cream"
+      "Real Techniques Makeup Brush Set",
+      "Beauty Blender Original",
+      "Shiseido Eyelash Curler",
+      "Conair Makeup Mirror",
+      "Tweezerman Tweezers"
     ];
 
-    // Find items in the database
     const items = await Item.find({ name: { $in: products } });
 
     if (!items || items.length === 0) {
@@ -28,43 +25,37 @@ const seedSales = async () => {
       process.exit();
     }
 
-    // Create sample sales
-    const salesData = [
-      {
-        item: items.find(p => p.name === "Nivea Body Lotion")._id,
-        quantity: 5,
-        seller: "Eyueal",
-        date: new Date("2025-12-05")
-      },
-      {
-        item: items.find(p => p.name === "The Body Shop Body Scrub")._id,
-        quantity: 4,
-        seller: "Eyueal",
-        date: new Date("2025-12-06")
-      },
-      {
-        item: items.find(p => p.name === "Dove Shower Gel")._id,
-        quantity: 6,
-        seller: "Eyueal",
-        date: new Date("2025-12-07")
-      },
-      {
-        item: items.find(p => p.name === "L'Occitane Hand Cream")._id,
-        quantity: 3,
-        seller: "Eyueal",
-        date: new Date("2025-12-08")
-      },
-      {
-        item: items.find(p => p.name === "Burt's Bees Foot Cream")._id,
-        quantity: 2,
-        seller: "Eyueal",
-        date: new Date("2025-12-09")
-      }
-    ];
+    // Helper function to get a random date in a given month of 2025
+    const getRandomDateInMonth = (month) => {
+      const day = Math.floor(Math.random() * 28) + 1; // avoids invalid days
+      return new Date(2025, month, day);
+    };
+
+    const salesData = [];
+
+    // Dynamically generate months 0–11
+    const months = Array.from({ length: 12 }, (_, i) => i);
+
+    products.forEach((productName) => {
+      const item = items.find(p => p.name === productName);
+      if (!item) return;
+
+      months.forEach((month) => {
+        // Exactly 2 sales per month
+        for (let i = 0; i < 2; i++) {
+          salesData.push({
+            item: item._id,
+            quantity: Math.floor(Math.random() * 10) + 1, // random 1–10
+            seller: "Eyueal",
+            date: getRandomDateInMonth(month),
+          });
+        }
+      });
+    });
 
     await Sale.insertMany(salesData);
 
-    console.log("Sample Body Care sales seeded successfully!");
+    console.log("Tools & Accessories sales seeded successfully for all 12 months!");
     process.exit();
   } catch (error) {
     console.error("Error seeding sales:", error);

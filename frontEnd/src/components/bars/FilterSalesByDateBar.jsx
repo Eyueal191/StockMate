@@ -3,32 +3,36 @@ import React, { useState, useContext } from "react";
 import { StockContext } from "../../stockContext/StockContext.jsx";
 
 function FilterSalesByDateBar() {
-  const { setLowerDate, setUpperDate } = useContext(StockContext);
+  const { setLowerDate, setUpperDate,  refetchSaleList} = useContext(StockContext);
 
   // Local state only
   const [tempLowerDate, setTempLowerDate] = useState("");
   const [tempUpperDate, setTempUpperDate] = useState("");
 
-  const handleFilter = () => {
+  const handleFilter = async() => {
     setLowerDate(tempLowerDate);
     setUpperDate(tempUpperDate);
+    await refetchSaleList()
   };
 
-  const handleClear = () => {
+  const handleClear = async() => {
     setTempLowerDate("");
     setTempUpperDate("");
     setLowerDate("");
     setUpperDate("");
+await refetchSaleList()
   };
-
   return (
     <div className="py-6 items-center xl:ml-[2vw]">
       {/* Title with improved font and separator */}
-      <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 flex items-center gap-3 mb-4">
+      <h1 className="hidden md:block text-3xl md:text-4xl font-extrabold text-gray-900 flex items-center gap-3 mb-4">
         <span>Filter Sale Records by Date Range</span>
         <span className="w-12 h-1 bg-gray-400 rounded-full mt-5"></span>
       </h1>
-
+      <h1 className="md:hidden text-3xl md:text-4xl font-extrabold text-gray-900 flex items-center gap-3 mb-4">
+        <span>Filter Sale By Date</span>
+        <span className="w-12 h-1 bg-gray-400 rounded-full mt-5"></span>
+      </h1>
       <div className="flex flex-col md:flex-row gap-4 md:items-center bg-gray-50 rounded-xl shadow-md justify-center border-2 border-gray-300 lg:mr-[15vw] p-4 mt-4">
 
         {/* From Date */}

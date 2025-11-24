@@ -1,0 +1,122 @@
+import React from "react";
+import Axios from "../../axios/axios.config.js";
+import toast from "react-hot-toast";
+import { User, Mail, Phone, ShieldCheck, ShieldX, Crown } from "lucide-react";
+
+function AdminManagementCard({ user, refreshList }) {
+
+  const handleGrantAdmin = async () => {
+    try {
+      const res = await Axios.put(`/api/user/grant-admin/${user._id}`);
+      const data = res.data;
+
+      if (data.success) {
+        toast.success(data.message);
+        refreshList();
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Error granting admin role");
+    }
+  };
+
+  const handleDenyAdmin = async () => {
+    try {
+      const res = await Axios.put(`/api/user/deny-admin/${user._id}`);
+      const data = res.data;
+
+      if (data.success) {
+        toast.success(data.message);
+        refreshList();
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Error denying admin role");
+    }
+  };
+
+  return (
+    <div
+      className="
+        p-5 rounded-xl bg-white flex items-center justify-between 
+        border border-gray-300 
+        outline outline-1 outline-gray-100 
+        shadow-sm 
+        hover:shadow-md hover:outline-blue-300 hover:border-blue-300
+        transition
+      "
+    >
+      {/* LEFT: USER DETAILS */}
+      <div className="flex-1 space-y-1">
+        <h1 className="font-semibold text-lg text-gray-800 flex items-center gap-2">
+          <User size={18} className="text-gray-700" />
+          {user?.name}
+        </h1>
+
+        <p className="text-gray-600 flex items-center gap-2">
+          <Mail size={16} className="text-blue-600" />
+          {user?.email}
+        </p>
+
+        <p className="text-gray-600 flex items-center gap-2">
+          <Phone size={16} className="text-green-600" />
+          {user?.phone || "Not provided"}
+        </p>
+      </div>
+
+      {/* MIDDLE: ROLE + STATUS */}
+      <div className="px-4 text-gray-700 space-y-1 text-right">
+        <p className="font-medium flex items-center gap-2 justify-end">
+          <Crown size={18} className="text-amber-500" />
+          Role: {user?.role}
+        </p>
+
+        <p className="font-medium flex items-center gap-2 justify-end">
+          {user?.adminRoleGranted ? (
+            <span className="px-2 py-1 bg-green-100 text-green-700 rounded-md text-sm flex items-center gap-1">
+              <ShieldCheck size={16} />
+              Admin Granted
+            </span>
+          ) : (
+            <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-sm flex items-center gap-1">
+              <ShieldX size={16} />
+              Staff Only
+            </span>
+          )}
+        </p>
+      </div>
+
+      {/* RIGHT: ACTION BUTTONS */}
+      {user?.role !== "Admin" && (
+        <div className="flex flex-col gap-2 ml-4">
+
+          {/* Grant Button */}
+          <button
+            onClick={handleGrantAdmin}
+            className="
+              px-4 py-2 bg-green-500 text-white rounded-lg flex items-center gap-2
+              shadow hover:bg-green-600 transition
+              animate-[sideBounce_2s_ease-in-out_infinite] hover:animate-none
+            "
+          >
+            <ShieldCheck size={18} />
+            Grant Admin
+          </button>
+
+          {/* Deny Button */}
+          <button
+            onClick={handleDenyAdmin}
+            className="
+              px-4 py-2 bg-red-500 text-white rounded-lg flex items-center gap-2
+              shadow hover:bg-red-600 transition
+              animate-[sideBounce_2s_ease-in-out_infinite] hover:animate-none
+            "
+          >
+            <ShieldX size={18} />
+            Deny Admin
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default AdminManagementCard;

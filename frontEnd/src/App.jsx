@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Loading from "./components/Loading.jsx";
-
+import StockProvider from "./stockContext/StockContext.jsx";
 // -------------------- Public Pages --------------------
 const Login = lazy(() => import("./pages/publicPages/LogIn.jsx"));
 const Register = lazy(() => import("./pages/publicPages/SignUp.jsx"));
@@ -44,8 +44,13 @@ const TopItems = lazy(() => import("./pages/protectedPages/dashBoard/report/TopI
 const LowStock = lazy(() => import("./pages/protectedPages/dashBoard/report/LowStock.jsx"));
 const SalesByDate = lazy(()=> import("./pages/protectedPages/dashBoard/report/SalesByDate.jsx"));
 const RevenueAnalytics = lazy(() => import("./pages/protectedPages/dashBoard/report/RevenueAnalytics.jsx"));
-
+// Account 
+const Account = lazy(()=> import("./pages/protectedPages/dashBoard/account/Account.jsx"))
+const AdminManagement = lazy(()=> import("./pages/protectedPages/dashBoard/account/AdminManagement.jsx"))
+const Profile = lazy(()=>import("./pages/protectedPages/dashBoard/account/Profile.jsx"))
+const Security = lazy(()=> import("./pages/protectedPages/dashBoard/account/Security.jsx"))
 function App() {
+  
   return (
     <>
       <Suspense fallback={<Loading />}>
@@ -65,7 +70,9 @@ function App() {
             path="/dashboard/*"
             element={
               <Authenticate>
-                <DashBoard />
+                <StockProvider>
+                      <DashBoard />
+                </StockProvider>
               </Authenticate>
             }
           >
@@ -104,7 +111,17 @@ function App() {
               <Route path="low-stock" element={<LowStock />} />
               <Route path="revenue-analytics" element={<RevenueAnalytics />} />
               <Route path="sales-by-date" element={<SalesByDate />}/>
+              
             </Route>
+            {/*Account Pages*/}
+            <Route path="account" element={<Account />}>
+        {/* Default /account shows Profile */}
+        <Route index element={<Profile />} />
+
+        {/* Specific pages */}
+        <Route path="security" element={<Security />} />
+        <Route path="admin-management" element={<AdminManagement />} />
+      </Route>
           </Route>
         </Routes>
       </Suspense>

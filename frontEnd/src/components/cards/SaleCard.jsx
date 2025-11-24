@@ -1,27 +1,26 @@
-// src/pages/protectedPages/dashBoard/sale/SaleCard.jsx
 import React, { useContext, useState } from "react";
 import { StockContext } from "../../stockContext/StockContext.jsx";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import Axios from "../../axios/axios.config.js"; // make sure path is correct
-import ImageIcon from "lucide-react/dist/esm/icons/image.js"; // imported icon
+import Axios from "../../axios/axios.config.js";
+import { ImageOff } from "lucide-react";
 
 function SaleCard({ sale }) {
   const navigate = useNavigate();
   const { refetchSaleList } = useContext(StockContext);
-  const [loading, setLoading] = useState(false); // added loading state
+  const [loading, setLoading] = useState(false);
 
   // Delete sale handler
   const deleteHandler = async () => {
-    if (loading) return; // prevent multiple clicks
-    setLoading(true); // set loading state
+    if (loading) return;
+    setLoading(true);
 
     try {
       const res = await Axios.delete(`/api/sale/${sale._id}`);
       if (res.data.success) {
         toast.success("Sale deleted successfully!");
-        await refetchSaleList(); // refresh sale list
-        setTimeout(() => navigate("/dashboard/sales"), 2000); // navigate after 2s
+        await refetchSaleList();
+        setTimeout(() => navigate("/dashboard/sales"), 2000);
       } else {
         toast.error(res.data.message || "Delete failed.");
       }
@@ -32,6 +31,17 @@ function SaleCard({ sale }) {
       setLoading(false);
     }
   };
+
+  // Show loading placeholder if sale or item not loaded
+  if (!sale || !sale.item) {
+    return (
+      <div className="w-full h-[200px] flex items-center justify-center bg-gray-200 rounded-xl">
+        <ImageOff className="w-16 h-16 text-gray-400" />
+      </div>
+    );
+  }
+
+  const { _id, name, description, image } = sale.item;
 
   return (
     <div
@@ -47,27 +57,29 @@ function SaleCard({ sale }) {
       "
     >
       {/* Sale Item Image */}
-      {sale.item.image ? (
-        <img
-          src={sale.item.image}
-          alt={sale.item.name}
-          className="w-full h-[200px] object-cover rounded-t-2xl flex-shrink-0"
-        />
-      ) : (
-        <div className="w-full h-[200px] bg-gray-200 rounded-t-2xl flex items-center justify-center text-gray-500">
-          <ImageIcon className="w-full h-full p-8 text-gray-400" />
-        </div>
-      )}
+      <div className="w-full h-[200px] flex items-center justify-center bg-gray-200 rounded-t-2xl overflow-hidden">
+        {image ? (
+          <img
+            src={image}
+            alt={name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <ImageOff className="w-16 h-16 text-gray-400" />
+          </div>
+        )}
+      </div>
 
       {/* Sale Details */}
       <div className="flex flex-col flex-1 mt-3 justify-between">
         <div className="flex flex-col gap-2">
           <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 line-clamp-1">
-            {sale.item.name}
+            {name}
           </h2>
-          {sale.item.description && (
+          {description && (
             <p className="text-gray-600 text-sm sm:text-base md:text-lg line-clamp-2">
-              {sale.item.description}
+              {description}
             </p>
           )}
           <p className="text-blue-600 font-medium text-sm sm:text-base md:text-lg">
@@ -92,7 +104,7 @@ function SaleCard({ sale }) {
           <button
             className="flex-1 py-2 px-4 rounded-xl font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors duration-300 shadow-sm text-sm sm:text-base md:text-lg"
             onClick={deleteHandler}
-            disabled={loading} // prevent double click while loading
+            disabled={loading}
           >
             {loading ? "Deleting..." : "Delete"}
           </button>
@@ -101,4 +113,5 @@ function SaleCard({ sale }) {
     </div>
   );
 }
+
 export default SaleCard;

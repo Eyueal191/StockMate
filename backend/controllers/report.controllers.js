@@ -34,49 +34,6 @@ const getSalesByItem = async (req, res, next) => {
     next(error);
   }
 };
-const getSalesByDate = async (req, res, next) => {
-  try {
-    // Optional date filters from query (?from=2025-01-01&to=2025-01-31)
-    const { from, to } = req.query;
-
-    const matchStage = {};
-    if (from && to) {
-      matchStage.date = {
-        $gte: new Date(from),
-        $lte: new Date(to)
-      };
-    }
-
-    const salesData = await Sale.aggregate([
-      { $match: matchStage },   // Filter if dates provided
-      {
-        $group: {
-          _id: {
-            $dateToString: { format: "%Y-%m-%d", date: "$date" }
-          },
-          sales: { $sum: "$quantity" }
-        }
-      },
-      { $sort: { _id: 1 } } // Sort by date ASC
-    ]);
-
-    // Convert result into final report
-    const report = salesData.map(item => ({
-      date: item._id,
-      sales: item.sales
-    }));
-
-    return res.status(200).json({
-      message: "Sales by date retrieved successfully",
-      success: true,
-      error: false,
-      report
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 const getSalesByCategory = async (req, res, next) => {
   try {
     const report = await Sale.aggregate([
@@ -188,8 +145,8 @@ try {
   {
     $group: {
       _id: "$itemData._id",         // Group by item ID
-      sale: { $sum: "$quantity" },  // Total quantity sold per item
-      name: { $first: "$itemData.name" } // Keep item name
+      sale: { $sum: "$quantity"},  // Total quantity sold per item
+      name: { $first: "$itemData.name"} // Keep item name
     }
   },
 
@@ -213,7 +170,7 @@ const getLowStockItems = async (req, res, next) => {
 try {
 const lowStockItems = await Item.find({})
   .sort({ stock: 1 }) // Sort by "stock" field in ascending order (lowest first)
-  .limit(50);         // Limit to top 50 items
+  .limit(10);         // Limit to top 50 items
 
   return res.status(200).json({
       message: "Low Stock Items List has been retrieved successfully",
@@ -289,7 +246,6 @@ const getRevenueAnalytics = async (req, res, next) => {
 
 export {
   getSalesByItem,
-  getSalesByDate,
   getSalesByCategory,
   getSalesOverview,
   getTopItems,

@@ -145,7 +145,7 @@ const logIn = async (req, res, next) => {
       httpOnly: true,                                   // JS cannot access
       secure: process.env.NODE_ENV === "production",   // HTTPS only in production
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Lax for localhost
-      maxAge: 15 * 60 * 1000,                          // 15 minutes
+      maxAge: 3 * 24 * 60 * 60 * 1000,                         // 15 minutes
       path: "/",                                       // available site-wide
     };
     res.cookie("accessToken", accessToken, cookieOptions);
@@ -155,6 +155,7 @@ const logIn = async (req, res, next) => {
       success: true,
       error: false,
       isLoggedIn: true,
+      user
     });
 
   } catch (err) {
@@ -297,9 +298,8 @@ const getUsersList = async (req, res, next) => {
 // 10. updateUser
 const updateUser = async (req, res, next) => {
   try {
-    const { id } = req.params;
-
-    let user = await User.findById(id);
+    const userId = req.user._id; // set by authenticateUser middleware
+    const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -309,21 +309,125 @@ const updateUser = async (req, res, next) => {
       });
     }
 
-    Object.assign(user, req.body);
-    await user.save();
+    // Only allow specific fields to be updated
+    const { name, email, phone, bio } = req.body;
+    if (name !== undefined) user.name = name;
+    if (email !== undefined) user.email = email;
+    if (phone !== undefined) user.phone = phone;
+    if (bio !== undefined) user.bio = bio;
+
+    const updatedUser = await user.save();
+
+    // Exclude password before sending
+    const userToReturn = updatedUser.toObject();
+    delete userToReturn.password;
 
     return res.status(200).json({
       message: "User has been updated successfully",
       success: true,
       error: false,
-      user,
+      user: userToReturn,
     });
+  } catch (error) {
+    next(error);
+  }
+};
 
+const changePassword = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        message: "Both current and new passwords are required",
+        success: false,
+        error: true,
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+        error: true,
+      });
+    }
+
+    // Verify old password
+    const isMatch = await comparePassword(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Current password is incorrect",
+        success: false,
+        error: true,
+      });
+    }
+
+    // Hash new password
+    user.password = await hashPassword(newPassword);
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Password has been changed successfully",
+      success: true,
+      error: false,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const grantAdminRole = async (req, res, next) => {
+  try { const {id}=req.params;
+        let user = await User.findById(id)
+        user.adminRoleGranted = true
+        await user.save()
+       return res.status(201).json({message:"AdminRole has been granted successfully", error:false, success:true})
+  } catch (error) {
+    next(error)
+  }
+}
+const denyAdminRole = async (req, res, next) => {
+  try {
+     const {id}=req.params;
+        let user = await User.findById(id)
+        user.adminRoleGranted = false
+        await user.save()
+       return res.status(201).json({message:"AdminRole has been denied successfully", error:false, success:true})
+  
+  } catch (error) {
+   next(error) 
+  }
+}
+const getUserById = async (req, res, next) => {
+  try {
+    const id = req.user._id;
+    console.log("userId", id);
+
+    const user = await User.findById(id).select("-password"); // Exclude password
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        error: false,
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "User has been retrieved successfully",
+      error: false,
+      success: true,
+      user, // ✅ send the user object
+    });
   } catch (error) {
     next(error);
   }
 };
 export {
+  getUserById,
   signUp,
   logIn,
   verifyEmailOtp,
@@ -332,5 +436,5 @@ export {
   verifyPasswordOtp,
   passwordReset,
   logOut,
-  getUsersList,updateUser
+  getUsersList,updateUser,changePassword,denyAdminRole,grantAdminRole
 };

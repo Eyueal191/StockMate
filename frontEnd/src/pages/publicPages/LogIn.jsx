@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Axios from "../../axios/axios.config.js";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
-import userApiSummary from "../../api/userApiSummary.js";
+
 function LogIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,13 +15,24 @@ function LogIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       const res = await Axios.post("/api/user/login", { email, password });
       const data = res.data;
 
       if (data.success) {
         toast.success(data.message);
+
+        // Store login status
         localStorage.setItem("IsLoggedIn", "true");
+        localStorage.setItem("userId", data.user._id)
+        // Store admin flag if user is admin
+        if (data.user.role === "Admin") {
+          localStorage.setItem("Admin", "true");
+        } else {
+          localStorage.removeItem("Admin");
+        }
+
         navigate("/dashboard");
       } else {
         toast.error(data.message || "Login failed");
@@ -35,26 +46,30 @@ function LogIn() {
 
   return (
     <div className="relative w-full min-h-screen flex items-center justify-center font-sans">
+
       {/* Background */}
       <img
         src={authBg}
         alt="Background"
         className="absolute w-full h-full object-cover z-[-2]"
       />
-      <div className="absolute w-full h-full bg-black/40 backdrop-blur-sm z-[-1]"></div>
+      <div className="absolute w-full h-full bg-black/40 backdrop-blur-sm z-[-1]" />
 
       {/* Form */}
       <div className="bg-white bg-opacity-95 backdrop-blur-md p-6 sm:p-8 md:p-10 lg:p-12 rounded-2xl shadow-2xl w-11/12 max-w-md md:max-w-lg lg:max-w-xl">
+        
+        {/* Header */}
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-center text-gray-800">
           Log In
         </h2>
-
         <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 text-center">
           Enter your credentials to access your account
         </p>
 
+        {/* Form Inputs */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-          {/* Email Input */}
+
+          {/* Email */}
           <label className="text-sm sm:text-base md:text-lg font-semibold text-gray-700">
             Email Address:
           </label>
@@ -67,7 +82,7 @@ function LogIn() {
             className="w-full border border-gray-300 rounded-xl px-4 py-3 sm:py-3 md:py-4 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all shadow-sm text-sm sm:text-base md:text-lg"
           />
 
-          {/* Password Input */}
+          {/* Password */}
           <label className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 mt-2">
             Password:
           </label>
@@ -88,7 +103,7 @@ function LogIn() {
             </span>
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
@@ -116,6 +131,7 @@ function LogIn() {
             Sign Up
           </button>
         </p>
+
       </div>
     </div>
   );

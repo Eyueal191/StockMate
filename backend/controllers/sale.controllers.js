@@ -78,29 +78,29 @@ const getSales = async (req, res, next) => {
     next(error);
   }
 };
-// 3. getSaleById
+
+// 3. Get Sale by ID
 const getSaleById = async (req, res, next) => {
   try {
     const { id } = req.params;
+    
+    // Find sale by ID and populate the 'item' field
+    const sale = await Sale.findOne({ _id: id }).populate("item", "name price image");
 
-    // Fetch the sale and populate item name & price
-    const soldItem = await Sale.findById(id).populate("item", "name price image");
-
-    if (!soldItem) {
+    if (!sale) {
       return res.status(404).json({
         message: "Sale record not found",
+        success: false,
         error: true,
-        success: false
       });
     }
 
-    return res.status(200).json({
+    res.status(200).json({
       message: "Sale record retrieved successfully",
       success: true,
       error: false,
-      data: soldItem
+      sale, // <-- frontend will use sale.item
     });
-
   } catch (error) {
     next(error);
   }
@@ -110,27 +110,53 @@ const getSaleById = async (req, res, next) => {
 const updateSale = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const updateData = req.body; // data to update (e.g., quantity, item, seller)
+    const updateData = req.body; // e.g., { quantity, item, seller }
 
-    // Find the sale by ID and update it
-    const updatedSale = await Sale.findByIdAndUpdate(id, updateData, {
-      new: true,           // return the updated document
-      runValidators: true, // ensure schema validations
-    }).populate("item", "name price"); // populate item info
-
-    if (!updatedSale) {
+    // Fetch previous sale and its item info
+    const previousSale = await Sale.findById(id).populate("item", "name stock");
+    if (!previousSale) {
       return res.status(404).json({
         message: "Sale record not found",
+        success: false,
         error: true,
-        success: false
       });
     }
+
+    const item = await Item.findById(previousSale.item._id);
+    if (!item) {
+      return res.status(404).json({
+        message: "Associated item not found",
+        success: false,
+        error: true,
+      });
+    }
+
+    // Calculate stock change
+    const newQuantity = Number(updateData.quantity);
+    const stockDiff = newQuantity - previousSale.quantity; // how much stock is needed extra
+    if (stockDiff > item.stock) {
+      return res.status(400).json({
+        message: "Insufficient stock: cannot update sale",
+        success: false,
+        error: true,
+      });
+    }
+
+    // Update item stock
+    item.stock -= stockDiff;
+    await item.save();
+
+    // Update sale record
+    const updatedSale = await Sale.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    }).populate("item", "name price");
 
     return res.status(200).json({
       message: "Sale record updated successfully",
       success: true,
       error: false,
-      data: updatedSale
+      data: updatedSale,
     });
   } catch (error) {
     next(error);

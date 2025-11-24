@@ -1,33 +1,49 @@
 import Item from "../models/item.js";
 import uploadSingleFile from "../utility/uploadSingleFile.js";
 import Category  from "../models/category.js";
-//1. Create a new item
 const addItem = async (req, res, next) => {
   try {
     const itemData = JSON.parse(req.body.data);
     const file = req.file;
     const image = file ? await uploadSingleFile(file) : null;
-    let existing = await Item.findOne({ name: itemData.name, description: itemData.description });
- if (existing) {
-  return res.status(200).json({
-    message: "Item already exist, go to update it's stock",
-    success: true,
-    error: false,
-  });
-}
-    const category = await Category.findOne({name:itemData.category});
-    const payload = image ? {image, category:category._id}:{category:category._id}
-    const item = await Item.create({ ...itemData,...payload});
-    res.status(200).json({
+
+    // Check if item already exists by name (case-insensitive)
+    let existing = await Item.findOne({
+      name: { $regex: `^${itemData.name}$`, $options: "i" },
+    });
+
+    if (existing) {
+      return res.status(409).json({
+        message: "Item already exists, go to update its stock",
+        success: false,
+        error: true,
+      });
+    }
+
+    // Get category
+    const category = await Category.findOne({ name: itemData.category });
+    if (!category) {
+      return res.status(400).json({
+        message: "Category not found",
+        success: false,
+        error: true,
+      });
+    }
+
+    // Create item payload
+    const payload = image ? { image, category: category._id } : { category: category._id };
+    const item = await Item.create({ ...itemData, ...payload });
+
+    res.status(201).json({
       message: "Item added successfully",
       success: true,
       error: false,
-      item
+      item,
     });
   } catch (error) {
     next(error);
   }
-};
+};  
 // 2. Get all items (filtered by categories if provided)
 const getItems = async (req, res, next) => {
   try {
@@ -94,33 +110,51 @@ const getItemById = async (req, res, next) => {
     next(error);
   }
 };
-// 4. update Item
 const updateItem = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const data  =  JSON.parse(req.body.data);
-    console.log("data")
-    if (data.category) {
-      const categoryDoc = await Category.findOne({ name: data.category });
-      if (categoryDoc) data.category = categoryDoc._id;
+
+    const { name, price, stock, category, description } = req.body;
+
+    // Convert category name to ObjectId
+    let categoryId;
+    if (category) {
+      const categoryDoc = await Category.findOne({ name: category });
+      if (categoryDoc) categoryId = categoryDoc._id;
     }
 
+    // Find item
     const item = await Item.findById(id).populate("category", "name");
-    if (!item) return res.status(404).json({ message: "Item not found", success: false, error: true });
+    if (!item) {
+      return res.status(404).json({
+        message: "Item not found",
+        success: false,
+        error: true,
+      });
+    }
 
+    // Handle image upload
     const file = req.file;
     const image = file ? await uploadSingleFile(file) : item.image;
 
-    Object.assign(item, data, { image });
+    // Update item
+    if (name !== undefined) item.name = name;
+    if (price !== undefined) item.price = price;
+    if (stock !== undefined) item.stock = stock;
+    if (description !== undefined) item.description = description;
+    if (categoryId) item.category = categoryId;
+    item.image = image;
+
     await item.save();
 
     res.status(200).json({
-      message: `Item updated successfully`,
+      message: "Item updated successfully",
       success: true,
       error: false,
-      updatedItem: item
+      updatedItem: item,
     });
   } catch (error) {
+    console.error(error);
     next(error);
   }
 };

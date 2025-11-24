@@ -6,22 +6,46 @@ import {
   updateItem,
   deleteItem,
 } from "../controllers/item.controllers.js";
-import upload from "../config/multer.js"
+
+import { authenticateUser, authorizeAdmin } from "../middlewares/auth.js";
+import { sanitizeItem } from "../middlewares/sanitizers/sanitizeItem.js";
+import { validateItem } from "../middlewares/validators/validateItem.js";
+import upload from "../config/multer.js";
+
 const itemRoutes = express.Router();
 
-// 1. Create a new item
-itemRoutes.post("/",upload.single("image"), addItem);
+// 1️⃣ Create a new item (Admin only)
+itemRoutes.post(
+  "/",
+  authenticateUser,
+  authorizeAdmin,
+  upload.single("image"),
+  sanitizeItem,
+  validateItem,
+  addItem
+);
 
-// 2. Get all items
+// 2️⃣ Get all items (Public)
 itemRoutes.get("/", getItems);
 
-// 3. Get item by ID
+// 3️⃣ Get item by ID (Public)
 itemRoutes.get("/:id", getItemById);
 
-// 4. Update an item by ID
-itemRoutes.put("/:id", updateItem);
+// 4️⃣ Update an item by ID (Admin only)
+itemRoutes.put(
+  "/:id",
+  authenticateUser,
+  authorizeAdmin,
+  upload.single("image"),
+  updateItem
+);
 
-// 5. Delete an item by ID
-itemRoutes.delete("/:id", deleteItem);
+// 5️⃣ Delete an item by ID (Admin only)
+itemRoutes.delete(
+  "/:id",
+  authenticateUser,
+  authorizeAdmin,
+  deleteItem
+);
 
 export default itemRoutes;

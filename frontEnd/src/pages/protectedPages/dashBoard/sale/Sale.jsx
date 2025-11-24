@@ -82,7 +82,7 @@ function Sale() {
         }
 
         {/* Main content */}
-        <main className="bg-white shadow-sm rounded-lg w-full">
+        <main className="bg-white shadow-sm rounded-lg w-full mx-auto">
           <Outlet />
         </main>
 

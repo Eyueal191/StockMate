@@ -54,12 +54,12 @@ function VerticalBarChart({ labels = [], values = [] }) {
     labels: filteredData.labels,
     datasets: [
       {
-        label: "Quantity Sold",
+        label: "", // remove tooltip title
         data: filteredData.values,
         backgroundColor: filteredData.values.map((_, i) => colors[i % colors.length]),
         borderRadius: 4,
         borderWidth: 1,
-        barThickness: 40,       // Fixed bar width
+        barThickness: 40,
         maxBarThickness: 40,
       },
     ],
@@ -69,9 +69,19 @@ function VerticalBarChart({ labels = [], values = [] }) {
     indexAxis: "x",
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+        top: 40, // <-- vertical padding to prevent label cut-off
+        bottom: 20,
+        left: 10,
+        right: 10,
+      },
+    },
     plugins: {
       legend: { display: false },
-      tooltip: { backgroundColor: "rgba(30,41,59,0.9)", titleColor: "#fff", bodyColor: "#e5e7eb" },
+      tooltip: {
+        enabled: false, // disable tooltip
+      },
       datalabels: {
         anchor: "end",
         align: "end",
@@ -94,7 +104,7 @@ function VerticalBarChart({ labels = [], values = [] }) {
           minRotation: 0,
           font: { weight: 500 },
         },
-        categoryPercentage: 0.6,  // Gap between bars
+        categoryPercentage: 0.6,
         barPercentage: 1,
       },
       y: {
@@ -105,7 +115,6 @@ function VerticalBarChart({ labels = [], values = [] }) {
     },
   };
 
-  // Dynamic container width: at least barWidth * number of bars + padding
   const containerMinWidth = Math.max(600, filteredData.labels.length * 60);
 
   return (
