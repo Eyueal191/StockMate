@@ -4,7 +4,7 @@ import Axios from "../../../../axios/axios.config.js";
 
 // Lazy load the DonutChart
 const DonutChart = lazy(() =>
-  import("../../../../components/charts/DonutChart.jsx")
+  import("../../../../components/charts/categoryDonutChart.jsx")
 );
 
 function SalesByCategory() {

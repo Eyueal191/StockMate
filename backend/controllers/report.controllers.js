@@ -48,33 +48,31 @@ const getSalesByCategory = async (req, res, next) => {
           as: "itemData"
         }
       },
-
       { $unwind: "$itemData" },
 
-      // Join Item -> Category to get category name
+      // Join Item -> Category
       {
         $lookup: {
-          from: "categories",          // your Category collection
-          localField: "itemData.category", // FK in Item
-          foreignField: "_id",         // PK in Category
+          from: "categories",
+          localField: "itemData.category",
+          foreignField: "_id",
           as: "categoryData"
         }
       },
+      { $unwind: "$categoryData" },
 
-      { $unwind: "$categoryData" },  // Flatten
-
-      // Group by category name
+      // Group by category and calculate revenue
       {
         $group: {
-          _id: "$categoryData.name",        // Use category name
-          totalSales: { $sum: "$quantity" } // Sum quantity sold
+          _id: "$categoryData.name",
+          totalRevenue: { $sum: { $multiply: ["$quantity", "$itemData.price"] } } // revenue = quantity * price
         }
       },
 
       // Format output
-      { $project: { _id: 0, category: "$_id", sales: "$totalSales" } },
+      { $project: { _id: 0, category: "$_id", sales: "$totalRevenue" } },
 
-      { $sort: { sales: -1 } } // optional
+      { $sort: { sales: -1 } }
     ]);
 
     return res.status(200).json({
@@ -82,7 +80,6 @@ const getSalesByCategory = async (req, res, next) => {
       success: true,
       report
     });
-
   } catch (error) {
     next(error);
   }
