@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import Axios from "../../axios/axios.config.js";
 import toast from "react-hot-toast";
 import { User, Mail, Phone, ShieldCheck, ShieldX, Crown } from "lucide-react";
 
 function AdminManagementCard({ user, refreshList }) {
+  const [loading, setLoading] = useState(false);
 
   const handleGrantAdmin = async () => {
+    setLoading(true);
     try {
       const res = await Axios.put(`/api/user/grant-admin/${user._id}`);
       const data = res.data;
@@ -16,10 +18,13 @@ function AdminManagementCard({ user, refreshList }) {
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Error granting admin role");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDenyAdmin = async () => {
+    setLoading(true);
     try {
       const res = await Axios.put(`/api/user/deny-admin/${user._id}`);
       const data = res.data;
@@ -30,6 +35,8 @@ function AdminManagementCard({ user, refreshList }) {
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Error denying admin role");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,36 +94,36 @@ function AdminManagementCard({ user, refreshList }) {
       {/* RIGHT: ACTION BUTTONS */}
       {user?.role !== "Admin" && (
         <div className="flex flex-col gap-2 ml-4">
-
           {/* Grant Button */}
           <button
             onClick={handleGrantAdmin}
-            className="
-              px-4 py-2 bg-green-500 text-white rounded-lg flex items-center gap-2
-              shadow hover:bg-green-600 transition
-              animate-[sideBounce_2s_ease-in-out_infinite] hover:animate-none
-            "
+            disabled={loading}
+            className={`
+              px-4 py-2 rounded-lg flex items-center gap-2
+              shadow transition
+              ${loading ? "bg-green-300 cursor-not-allowed" : "bg-green-500 text-white hover:bg-green-600"}
+            `}
           >
             <ShieldCheck size={18} />
-            Grant Admin
+            {loading ? "Processing..." : "Grant Admin"}
           </button>
 
           {/* Deny Button */}
           <button
             onClick={handleDenyAdmin}
-            className="
-              px-4 py-2 bg-red-500 text-white rounded-lg flex items-center gap-2
-              shadow hover:bg-red-600 transition
-              animate-[sideBounce_2s_ease-in-out_infinite] hover:animate-none
-            "
+            disabled={loading}
+            className={`
+              px-4 py-2 rounded-lg flex items-center gap-2
+              shadow transition
+              ${loading ? "bg-red-300 cursor-not-allowed" : "bg-red-500 text-white hover:bg-red-600"}
+            `}
           >
             <ShieldX size={18} />
-            Deny Admin
+            {loading ? "Processing..." : "Deny Admin"}
           </button>
         </div>
       )}
     </div>
   );
 }
-
 export default AdminManagementCard;
